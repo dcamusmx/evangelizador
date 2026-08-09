@@ -14,16 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contenido_diario: {
+        Row: {
+          actualizado_por: string | null
+          cita_evangelio: string | null
+          created_at: string
+          descripcion_base: string | null
+          estado: Database["public"]["Enums"]["estado_contenido"]
+          fecha: string
+          fileid_pcloud: number | null
+          link_publico_pcloud: string | null
+          link_youtube: string | null
+          nombre_archivo_pcloud: string | null
+          reflexion: string | null
+          santo_o_tiempo_liturgico: string | null
+          subido_por: string | null
+          titulo: string | null
+          updated_at: string
+        }
+        Insert: {
+          actualizado_por?: string | null
+          cita_evangelio?: string | null
+          created_at?: string
+          descripcion_base?: string | null
+          estado?: Database["public"]["Enums"]["estado_contenido"]
+          fecha: string
+          fileid_pcloud?: number | null
+          link_publico_pcloud?: string | null
+          link_youtube?: string | null
+          nombre_archivo_pcloud?: string | null
+          reflexion?: string | null
+          santo_o_tiempo_liturgico?: string | null
+          subido_por?: string | null
+          titulo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actualizado_por?: string | null
+          cita_evangelio?: string | null
+          created_at?: string
+          descripcion_base?: string | null
+          estado?: Database["public"]["Enums"]["estado_contenido"]
+          fecha?: string
+          fileid_pcloud?: number | null
+          link_publico_pcloud?: string | null
+          link_youtube?: string | null
+          nombre_archivo_pcloud?: string | null
+          reflexion?: string | null
+          santo_o_tiempo_liturgico?: string | null
+          subido_por?: string | null
+          titulo?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nombre: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          nombre?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "editor" | "pendiente"
+      estado_contenido:
+        | "pendiente_reflexion"
+        | "pendiente_video"
+        | "listo_para_publicar"
+        | "programado"
+        | "publicado"
+        | "error"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +244,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "editor", "pendiente"],
+      estado_contenido: [
+        "pendiente_reflexion",
+        "pendiente_video",
+        "listo_para_publicar",
+        "programado",
+        "publicado",
+        "error",
+      ],
+    },
   },
 } as const
