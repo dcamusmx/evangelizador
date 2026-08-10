@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { KeyRound } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
@@ -40,7 +41,7 @@ const hoy = new Date();
 const anios = [hoy.getFullYear() - 1, hoy.getFullYear(), hoy.getFullYear() + 1];
 
 function Mantenimiento() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [anio, setAnio] = useState(String(hoy.getFullYear()));
   const [mes, setMes] = useState(String(hoy.getMonth() + 1).padStart(2, "0"));
@@ -67,6 +68,15 @@ function Mantenimiento() {
       <PageHeader
         titulo="Mantenimiento"
         descripcion="Selecciona un mes para revisar y escribir las reflexiones."
+        acciones={
+          profile?.role === "admin" ? (
+            <Button variant="outline" asChild>
+              <Link to="/admin/credenciales">
+                <KeyRound className="mr-2 h-4 w-4" /> Credenciales
+              </Link>
+            </Button>
+          ) : null
+        }
       />
 
       <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">

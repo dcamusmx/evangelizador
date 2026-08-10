@@ -7,17 +7,20 @@ export interface PcloudConfig {
   carpeta: string;
 }
 
-export function leerConfigPcloud(): PcloudConfig {
-  const token = process.env["PCLOUD_AUTH_TOKEN"];
+export async function obtenerConfigPcloud(): Promise<PcloudConfig> {
+  const { credencialOEnv } = await import("@/lib/credenciales.server");
+  const token = await credencialOEnv("pcloud", "AUTH_TOKEN", "PCLOUD_AUTH_TOKEN");
   if (!token) {
     throw new Error(
-      "Falta la credencial de pCloud. Un administrador debe configurarla antes de subir videos.",
+      "Falta la credencial de pCloud. Un administrador debe configurarla en Credenciales.",
     );
   }
+  const host = await credencialOEnv("pcloud", "API_HOST", "PCLOUD_API_HOST");
+  const carpeta = await credencialOEnv("pcloud", "CARPETA", "PCLOUD_CARPETA");
   return {
-    host: process.env["PCLOUD_API_HOST"] ?? "eapi.pcloud.com",
+    host: host ?? "eapi.pcloud.com",
     token,
-    carpeta: process.env["PCLOUD_CARPETA"] ?? "/EvangelioDiario",
+    carpeta: carpeta ?? "/EvangelioDiario",
   };
 }
 

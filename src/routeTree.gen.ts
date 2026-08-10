@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMantenimientoRouteImport } from './routes/_authenticated/mantenimiento'
 import { Route as AuthenticatedSubirRouteImport } from './routes/_authenticated/subir'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthenticatedAdminCredencialesRouteImport } from './routes/_authenticated/admin.credenciales'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -47,6 +48,12 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminCredencialesRoute =
+  AuthenticatedAdminCredencialesRouteImport.update({
+    id: '/admin/credenciales',
+    path: '/admin/credenciales',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminUsuariosRoute =
   AuthenticatedAdminUsuariosRouteImport.update({
     id: '/admin/usuarios',
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
 }
 export interface FileRoutesByTo {
@@ -68,6 +76,7 @@ export interface FileRoutesByTo {
   '/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/': typeof AuthenticatedIndexRoute
+  '/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
 }
 export interface FileRoutesById {
@@ -78,6 +87,7 @@ export interface FileRoutesById {
   '/_authenticated/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
 }
 export interface FileRouteTypes {
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/mantenimiento'
     | '/subir'
     | '/auth/callback'
+    | '/admin/credenciales'
     | '/admin/usuarios'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/subir'
     | '/auth/callback'
     | '/'
+    | '/admin/credenciales'
     | '/admin/usuarios'
   id:
     | '__root__'
@@ -105,6 +117,7 @@ export interface FileRouteTypes {
     | '/_authenticated/subir'
     | '/auth/callback'
     | '/_authenticated/'
+    | '/_authenticated/admin/credenciales'
     | '/_authenticated/admin/usuarios'
   fileRoutesById: FileRoutesById
 }
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/credenciales': {
+      id: '/_authenticated/admin/credenciales'
+      path: '/admin/credenciales'
+      fullPath: '/admin/credenciales'
+      preLoaderRoute: typeof AuthenticatedAdminCredencialesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/usuarios': {
       id: '/_authenticated/admin/usuarios'
       path: '/admin/usuarios'
@@ -172,6 +192,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMantenimientoRoute: typeof AuthenticatedMantenimientoRoute
   AuthenticatedSubirRoute: typeof AuthenticatedSubirRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAdminCredencialesRoute: typeof AuthenticatedAdminCredencialesRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
 }
 
@@ -179,6 +200,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMantenimientoRoute: AuthenticatedMantenimientoRoute,
   AuthenticatedSubirRoute: AuthenticatedSubirRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAdminCredencialesRoute: AuthenticatedAdminCredencialesRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
 }
 
@@ -193,13 +215,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

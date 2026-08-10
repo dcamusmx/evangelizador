@@ -68,6 +68,45 @@ export type Database = {
         }
         Relationships: []
       }
+      credenciales: {
+        Row: {
+          activo: boolean
+          actualizado_por: string | null
+          created_at: string
+          descripcion: string | null
+          id: string
+          nombre: string
+          pista: string | null
+          servicio: string
+          updated_at: string
+          valor_cifrado: string
+        }
+        Insert: {
+          activo?: boolean
+          actualizado_por?: string | null
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          pista?: string | null
+          servicio: string
+          updated_at?: string
+          valor_cifrado: string
+        }
+        Update: {
+          activo?: boolean
+          actualizado_por?: string | null
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          pista?: string | null
+          servicio?: string
+          updated_at?: string
+          valor_cifrado?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
