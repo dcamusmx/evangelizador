@@ -67,6 +67,15 @@ function Mantenimiento() {
       <PageHeader
         titulo="Mantenimiento"
         descripcion="Selecciona un mes para revisar y escribir las reflexiones."
+        acciones={
+          profile?.role === "admin" ? (
+            <Button variant="outline" asChild>
+              <Link to="/admin/credenciales">
+                <KeyRound className="mr-2 h-4 w-4" /> Credenciales
+              </Link>
+            </Button>
+          ) : null
+        }
       />
 
       <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">

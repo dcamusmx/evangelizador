@@ -7,7 +7,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { useState } from "react";
-import { CalendarDays, Home, LogOut, Menu, Upload, Users, X } from "lucide-react";
+import { CalendarDays, Home, KeyRound, LogOut, Menu, Upload, Users, X } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
@@ -31,6 +31,7 @@ const navItems = [
   { to: "/subir", label: "Subir video", icon: Upload, adminOnly: false },
   { to: "/mantenimiento", label: "Mantenimiento", icon: CalendarDays, adminOnly: false },
   { to: "/admin/usuarios", label: "Usuarios", icon: Users, adminOnly: true },
+  { to: "/admin/credenciales", label: "Credenciales", icon: KeyRound, adminOnly: true },
 ] as const;
 
 function DashboardLayout() {
