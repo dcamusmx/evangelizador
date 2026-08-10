@@ -18,10 +18,10 @@ export const solicitarEnlaceSubida = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await exigirStaff(context);
-    const { leerConfigPcloud, asegurarCarpeta, crearEnlaceSubida } = await import(
+    const { obtenerConfigPcloud, asegurarCarpeta, crearEnlaceSubida } = await import(
       "@/lib/pcloud.server"
     );
-    const cfg = leerConfigPcloud();
+    const cfg = await obtenerConfigPcloud();
     const folderid = await asegurarCarpeta(cfg);
     const nombreArchivo = `${data.fecha}.${data.extension.toLowerCase()}`;
     const { code, uploadlinkid } = await crearEnlaceSubida(
@@ -51,9 +51,9 @@ export const confirmarSubida = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await exigirStaff(context);
-    const { leerConfigPcloud, buscarArchivo, obtenerLinkPublico, borrarEnlaceSubida } =
+    const { obtenerConfigPcloud, buscarArchivo, obtenerLinkPublico, borrarEnlaceSubida } =
       await import("@/lib/pcloud.server");
-    const cfg = leerConfigPcloud();
+    const cfg = await obtenerConfigPcloud();
 
     await borrarEnlaceSubida(cfg, data.uploadlinkid);
 
