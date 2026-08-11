@@ -1,11 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-/** Límite de subida simple (PUT). Por encima habría que migrar a multipart. */
-export const TAMANO_MAXIMO_BYTES = 5 * 1024 * 1024 * 1024;
-const EXPIRA_SUBIDA = 600; // 10 minutos
-const EXPIRA_DESCARGA = 3600; // 1 hora
+import { EXPIRA_DESCARGA, EXPIRA_SUBIDA, TAMANO_MAXIMO_BYTES } from "@/lib/r2.constants";
 
 async function exigirStaff(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("is_staff", { _user_id: context.userId });

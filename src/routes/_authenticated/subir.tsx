@@ -8,7 +8,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { confirmarSubidaR2, crearUrlSubidaR2, TAMANO_MAXIMO_BYTES } from "@/lib/r2.functions";
+import { TAMANO_MAXIMO_BYTES } from "@/lib/r2.constants";
+import { confirmarSubidaR2, crearUrlSubidaR2 } from "@/lib/r2.functions";
 import { fechaLarga } from "@/types/database";
 
 export const Route = createFileRoute("/_authenticated/subir")({
