@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { confirmarSubida, solicitarEnlaceSubida } from "@/lib/pcloud.functions";
+import { confirmarSubidaR2, crearUrlSubidaR2, TAMANO_MAXIMO_BYTES } from "@/lib/r2.functions";
 import { fechaLarga } from "@/types/database";
 
 export const Route = createFileRoute("/_authenticated/subir")({
@@ -31,44 +31,31 @@ function hoyISO() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function subirAlEnlace(
-  endpoint: string,
-  code: string,
-  nombreArchivo: string,
+function subirConProgreso(
+  uploadUrl: string,
+  contentType: string,
   archivo: File,
   onProgreso: (pct: number) => void,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const form = new FormData();
-    form.append("code", code);
-    form.append("names", nombreArchivo);
-    form.append("file", archivo, nombreArchivo);
-
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", endpoint);
+    xhr.open("PUT", uploadUrl);
+    xhr.setRequestHeader("Content-Type", contentType);
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgreso(Math.round((e.loaded / e.total) * 100));
     };
-    xhr.onerror = () => reject(new Error("Se interrumpió la conexión durante la subida."));
+    xhr.onerror = () => reject(new Error("La conexión con Cloudflare R2 falló."));
     xhr.onload = () => {
-      try {
-        const res = JSON.parse(xhr.responseText) as { result: number; error?: string };
-        if (res.result !== 0) {
-          reject(new Error(res.error ?? "El almacenamiento rechazó el archivo."));
-          return;
-        }
-        resolve();
-      } catch {
-        reject(new Error("Respuesta inesperada del almacenamiento."));
-      }
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else reject(new Error(`Cloudflare R2 rechazó el archivo (código ${xhr.status}).`));
     };
-    xhr.send(form);
+    xhr.send(archivo);
   });
 }
 
 function SubirVideo() {
-  const pedirEnlace = useServerFn(solicitarEnlaceSubida);
-  const confirmar = useServerFn(confirmarSubida);
+  const pedirUrl = useServerFn(crearUrlSubidaR2);
+  const confirmar = useServerFn(confirmarSubidaR2);
 
   const [fecha, setFecha] = useState(hoyISO());
   const [archivo, setArchivo] = useState<File | null>(null);
@@ -76,46 +63,53 @@ function SubirVideo() {
   const [fase, setFase] = useState<"idle" | "preparando" | "subiendo" | "confirmando" | "listo">(
     "idle",
   );
-  const [resultado, setResultado] = useState<{ link: string; nombreArchivo: string } | null>(null);
+  const [resultado, setResultado] = useState<{ objectKey: string; nombreArchivo: string } | null>(
+    null,
+  );
 
   const ocupado = fase !== "idle" && fase !== "listo";
 
   const iniciar = async () => {
-    if (!archivo) return;
+    if (!archivo) {
+      toast.error("Selecciona un archivo de video.");
+      return;
+    }
+    if (!archivo.type.startsWith("video/")) {
+      toast.error("El archivo debe ser un video.");
+      return;
+    }
+    if (archivo.size <= 0) {
+      toast.error("El archivo está vacío.");
+      return;
+    }
+    if (archivo.size > TAMANO_MAXIMO_BYTES) {
+      toast.error("El video supera el tamaño máximo permitido (5 GB).");
+      return;
+    }
+
     setResultado(null);
     try {
       setFase("preparando");
-      const extension = archivo.name.split(".").pop() ?? "mp4";
-      const enlace = await pedirEnlace({ data: { fecha, extension } });
+      const contentType = archivo.type || "video/mp4";
+      const firma = await pedirUrl({
+        data: { fecha, filename: archivo.name, contentType, fileSize: archivo.size },
+      });
 
       setFase("subiendo");
       setProgreso(0);
-      await subirAlEnlace(
-        enlace.endpoint,
-        enlace.code,
-        enlace.nombreArchivo,
-        archivo,
-        setProgreso,
-      );
+      await subirConProgreso(firma.uploadUrl, contentType, archivo, setProgreso);
 
       setFase("confirmando");
-      const res = await confirmar({
-        data: {
-          fecha,
-          folderid: enlace.folderid,
-          uploadlinkid: enlace.uploadlinkid,
-          nombreArchivo: enlace.nombreArchivo,
-        },
-      });
+      const res = await confirmar({ data: { fecha, objectKey: firma.objectKey } });
 
-      setResultado({ link: res.link, nombreArchivo: res.nombreArchivo });
+      setResultado({ objectKey: res.objectKey, nombreArchivo: res.nombreArchivo });
       setFase("listo");
-      toast.success("Video subido y registrado correctamente.");
+      toast.success("Video subido correctamente.");
     } catch (e) {
       console.error(e);
       setFase("idle");
       setProgreso(null);
-      toast.error(e instanceof Error ? e.message : "No pudimos completar la subida.");
+      toast.error(e instanceof Error ? e.message : "No fue posible preparar la subida.");
     }
   };
 
@@ -123,7 +117,7 @@ function SubirVideo() {
     <div className="mx-auto w-full max-w-2xl">
       <PageHeader
         titulo="Subir video"
-        descripcion="El archivo viaja directo desde tu navegador al almacenamiento; nunca pasa por el servidor."
+        descripcion="El archivo viaja directo desde tu navegador a Cloudflare R2; nunca pasa por el servidor."
       />
 
       <div className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
@@ -172,11 +166,11 @@ function SubirVideo() {
         <Button className="h-11 w-full gap-2" disabled={!archivo || ocupado} onClick={iniciar}>
           <UploadCloud className="h-4 w-4" />
           {fase === "preparando"
-            ? "Preparando…"
+            ? "Preparando subida…"
             : fase === "subiendo"
               ? "Subiendo…"
               : fase === "confirmando"
-                ? "Registrando…"
+                ? "Verificando archivo…"
                 : "Subir video"}
         </Button>
 
@@ -184,15 +178,8 @@ function SubirVideo() {
           <div className="flex items-start gap-3 rounded-xl border border-border bg-secondary/50 p-4">
             <CheckCircle2 className="mt-0.5 h-5 w-5 text-accent-strong" />
             <div className="min-w-0 text-sm">
-              <p className="font-medium text-foreground">{resultado.nombreArchivo}</p>
-              <a
-                href={resultado.link}
-                target="_blank"
-                rel="noreferrer"
-                className="break-all text-xs text-primary underline"
-              >
-                {resultado.link}
-              </a>
+              <p className="font-medium text-foreground">Video subido correctamente</p>
+              <p className="break-all text-xs text-muted-foreground">{resultado.objectKey}</p>
             </div>
           </div>
         ) : null}
