@@ -25,6 +25,7 @@ import {
   eliminarCredencial,
   probarCredencialPcloud,
 } from "@/lib/credenciales.functions";
+import { probarCredencialR2 } from "@/lib/r2.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/credenciales")({
   head: () => ({
@@ -46,8 +47,19 @@ export const Route = createFileRoute("/_authenticated/admin/credenciales")({
 
 const CATALOGO: Record<string, { etiqueta: string; campos: { nombre: string; ayuda: string }[] }> =
   {
+    cloudflare_r2: {
+      etiqueta: "Cloudflare R2",
+      campos: [
+        { nombre: "ACCOUNT_ID", ayuda: "Account ID de tu cuenta de Cloudflare" },
+        { nombre: "ACCESS_KEY_ID", ayuda: "Access Key ID del API Token de R2" },
+        { nombre: "SECRET_ACCESS_KEY", ayuda: "Secret Access Key del API Token de R2" },
+        { nombre: "BUCKET_NAME", ayuda: "Nombre del bucket, por ejemplo evangelio-diario" },
+        { nombre: "ENDPOINT", ayuda: "https://{ACCOUNT_ID}.r2.cloudflarestorage.com" },
+        { nombre: "PUBLIC_BASE_URL", ayuda: "Opcional: dominio público del bucket" },
+      ],
+    },
     pcloud: {
-      etiqueta: "pCloud",
+      etiqueta: "pCloud (legacy)",
       campos: [
         { nombre: "AUTH_TOKEN", ayuda: "Token de acceso de la API de pCloud" },
         { nombre: "API_HOST", ayuda: "eapi.pcloud.com (Europa) o api.pcloud.com" },
@@ -89,10 +101,11 @@ function CredencialesPage() {
   const cambiar = useServerFn(cambiarEstadoCredencial);
   const borrar = useServerFn(eliminarCredencial);
   const probar = useServerFn(probarCredencialPcloud);
+  const probarR2 = useServerFn(probarCredencialR2);
 
-  const [servicio, setServicio] = useState("pcloud");
+  const [servicio, setServicio] = useState("cloudflare_r2");
   const [servicioLibre, setServicioLibre] = useState("");
-  const [nombre, setNombre] = useState("AUTH_TOKEN");
+  const [nombre, setNombre] = useState("ACCOUNT_ID");
   const [descripcion, setDescripcion] = useState("");
   const [valor, setValor] = useState("");
 
@@ -143,9 +156,20 @@ function CredencialesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const puedeProbar = servicio === "cloudflare_r2" || servicio === "pcloud";
+  const etiquetaProbar =
+    servicio === "cloudflare_r2" ? "Probar Cloudflare R2" : "Probar pCloud";
+
   const mProbar = useMutation({
-    mutationFn: () => probar({}),
-    onSuccess: (r: { email: string }) => toast.success(`pCloud responde: ${r.email}`),
+    mutationFn: async () => {
+      if (servicio === "cloudflare_r2") {
+        const r = await probarR2({});
+        return r.message;
+      }
+      const r = await probar({});
+      return `pCloud responde: ${r.email}`;
+    },
+    onSuccess: (mensaje: string) => toast.success(mensaje),
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -163,9 +187,9 @@ function CredencialesPage() {
           <Button
             variant="outline"
             onClick={() => mProbar.mutate()}
-            disabled={mProbar.isPending}
+            disabled={mProbar.isPending || !puedeProbar}
           >
-            {mProbar.isPending ? "Probando..." : "Probar pCloud"}
+            {mProbar.isPending ? "Probando..." : etiquetaProbar}
           </Button>
         }
       />
@@ -263,7 +287,7 @@ function CredencialesPage() {
       ) : !data?.length ? (
         <EmptyState
           titulo="Aún no hay credenciales"
-          descripcion="Agrega la primera para conectar pCloud, n8n o Telegram."
+          descripcion="Agrega la primera para conectar Cloudflare R2, n8n o Telegram."
         />
       ) : (
         <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)]">
@@ -290,7 +314,7 @@ function CredencialesPage() {
                     ) : null}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {c.pista ?? "••••"}
+                    {c.pista ? "Configurada ••••••••••" : "Configurada"}
                   </td>
                   <td className="px-4 py-3">
                     <Switch
