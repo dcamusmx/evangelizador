@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { generarMes } from "@/lib/n8n.functions";
+
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { KeyRound } from "lucide-react";
@@ -48,6 +51,17 @@ function Mantenimiento() {
 
   const inicio = `${anio}-${mes}-01`;
   const fin = new Date(Number(anio), Number(mes), 0).toISOString().slice(0, 10);
+
+  const generar = useServerFn(generarMes);
+  const mGenerar = useMutation({
+    mutationFn: () => generar({ data: { anio: Number(anio), mes: Number(mes) } }),
+    onSuccess: (r: { mensaje: string }) => {
+      toast.success(r.mensaje);
+      void queryClient.invalidateQueries({ queryKey: ["contenido_mes", anio, mes] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["contenido_mes", anio, mes],
