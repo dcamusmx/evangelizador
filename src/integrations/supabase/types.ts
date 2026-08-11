@@ -28,6 +28,13 @@ export type Database = {
           nombre_archivo_pcloud: string | null
           reflexion: string | null
           santo_o_tiempo_liturgico: string | null
+          storage_content_type: string | null
+          storage_etag: string | null
+          storage_filename: string | null
+          storage_key: string | null
+          storage_provider: string | null
+          storage_size: number | null
+          storage_uploaded_at: string | null
           subido_por: string | null
           titulo: string | null
           updated_at: string
@@ -45,6 +52,13 @@ export type Database = {
           nombre_archivo_pcloud?: string | null
           reflexion?: string | null
           santo_o_tiempo_liturgico?: string | null
+          storage_content_type?: string | null
+          storage_etag?: string | null
+          storage_filename?: string | null
+          storage_key?: string | null
+          storage_provider?: string | null
+          storage_size?: number | null
+          storage_uploaded_at?: string | null
           subido_por?: string | null
           titulo?: string | null
           updated_at?: string
@@ -62,6 +76,13 @@ export type Database = {
           nombre_archivo_pcloud?: string | null
           reflexion?: string | null
           santo_o_tiempo_liturgico?: string | null
+          storage_content_type?: string | null
+          storage_etag?: string | null
+          storage_filename?: string | null
+          storage_key?: string | null
+          storage_provider?: string | null
+          storage_size?: number | null
+          storage_uploaded_at?: string | null
           subido_por?: string | null
           titulo?: string | null
           updated_at?: string
