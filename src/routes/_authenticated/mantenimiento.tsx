@@ -105,13 +105,15 @@ function Mantenimiento() {
               ))}
             </SelectContent>
           </Select>
-          <Button disabled title="Disponible en la siguiente fase">
-            Generar mes
+          <Button onClick={() => mGenerar.mutate()} disabled={mGenerar.isPending}>
+            {mGenerar.isPending ? "Generando..." : "Generar mes"}
           </Button>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          La generación automática del mes se conectará con el flujo externo en la siguiente fase.
+          Si hay un flujo externo configurado en Credenciales, se usará ese; si no, se crearán los
+          días vacíos para escribir las reflexiones.
         </p>
+
       </div>
 
       {isLoading ? (
