@@ -82,7 +82,7 @@ function ListadoPrincipal() {
         descripcion="Consulta el estado de cada Evangelio: reflexión, video y publicación."
       />
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Select value={anio} onValueChange={setAnio}>
           <SelectTrigger>
             <SelectValue placeholder="Año" />
