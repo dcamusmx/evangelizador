@@ -42,6 +42,8 @@ function ListadoPrincipal() {
   const [mes, setMes] = useState<string>("todos");
   const [estado, setEstado] = useState<string>("todos");
   const [busqueda, setBusqueda] = useState("");
+  const [orden, setOrden] = useState<"desc" | "asc">("desc");
+
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["contenido_diario", anio],
@@ -59,7 +61,7 @@ function ListadoPrincipal() {
 
   const filas = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    return (data ?? []).filter((r) => {
+    const lista = (data ?? []).filter((r) => {
       if (mes !== "todos" && r.fecha.slice(5, 7) !== mes) return false;
       if (estado !== "todos" && r.estado !== estado) return false;
       if (!q) return true;
@@ -67,7 +69,11 @@ function ListadoPrincipal() {
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(q));
     });
-  }, [data, mes, estado, busqueda]);
+    return lista.sort((a, b) =>
+      orden === "desc" ? b.fecha.localeCompare(a.fecha) : a.fecha.localeCompare(b.fecha),
+    );
+  }, [data, mes, estado, busqueda, orden]);
+
 
   return (
     <div className="mx-auto w-full max-w-6xl">
@@ -76,7 +82,7 @@ function ListadoPrincipal() {
         descripcion="Consulta el estado de cada Evangelio: reflexión, video y publicación."
       />
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Select value={anio} onValueChange={setAnio}>
           <SelectTrigger>
             <SelectValue placeholder="Año" />
@@ -117,6 +123,18 @@ function ListadoPrincipal() {
             ))}
           </SelectContent>
         </Select>
+
+        <Select value={orden} onValueChange={(v) => setOrden(v as "desc" | "asc")}>
+          <SelectTrigger>
+            <SelectValue placeholder="Orden" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desc">Fecha: más reciente primero</SelectItem>
+            <SelectItem value="asc">Fecha: más antigua primero</SelectItem>
+          </SelectContent>
+        </Select>
+
+
 
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

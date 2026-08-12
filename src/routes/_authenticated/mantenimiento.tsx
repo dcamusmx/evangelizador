@@ -5,7 +5,10 @@ import { generarMes } from "@/lib/n8n.functions";
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { KeyRound } from "lucide-react";
+import { KeyRound, Pencil } from "lucide-react";
+
+import { EditarRegistroDialog } from "@/components/EditarRegistroDialog";
+
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
@@ -166,6 +169,8 @@ function TarjetaDia({
 }) {
   const [texto, setTexto] = useState(registro.reflexion ?? "");
   const [guardando, setGuardando] = useState(false);
+  const [editando, setEditando] = useState(false);
+
 
   useEffect(() => {
     setTexto(registro.reflexion ?? "");
@@ -204,7 +209,12 @@ function TarjetaDia({
           </p>
           <p className="text-xs text-muted-foreground">{registro.cita_evangelio ?? "—"}</p>
         </div>
-        <StatusBadge estado={registro.estado} />
+        <div className="flex items-center gap-2">
+          <StatusBadge estado={registro.estado} />
+          <Button variant="outline" size="sm" onClick={() => setEditando(true)}>
+            <Pencil className="mr-2 h-3.5 w-3.5" /> Ver / editar
+          </Button>
+        </div>
       </div>
 
       <Textarea
@@ -219,6 +229,15 @@ function TarjetaDia({
           {guardando ? "Guardando..." : "Guardar"}
         </Button>
       </div>
+
+      <EditarRegistroDialog
+        registro={registro}
+        userId={userId}
+        abierto={editando}
+        onOpenChange={setEditando}
+        onGuardado={onGuardado}
+      />
     </article>
   );
 }
+

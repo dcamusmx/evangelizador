@@ -17,6 +17,7 @@ import { Route as AuthenticatedSubirRouteImport } from './routes/_authenticated/
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedAdminCredencialesRouteImport } from './routes/_authenticated/admin.credenciales'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
+import { Route as ApiPublicR2DownloadUrlRouteImport } from './routes/api/public/r2-download-url'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -60,6 +61,11 @@ const AuthenticatedAdminUsuariosRoute =
     path: '/admin/usuarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicR2DownloadUrlRoute = ApiPublicR2DownloadUrlRouteImport.update({
+  id: '/api/public/r2-download-url',
+  path: '/api/public/r2-download-url',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/api/public/r2-download-url': typeof ApiPublicR2DownloadUrlRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/api/public/r2-download-url': typeof ApiPublicR2DownloadUrlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/api/public/r2-download-url': typeof ApiPublicR2DownloadUrlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/admin/credenciales'
     | '/admin/usuarios'
+    | '/api/public/r2-download-url'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/credenciales'
     | '/admin/usuarios'
+    | '/api/public/r2-download-url'
   id:
     | '__root__'
     | '/_authenticated'
@@ -119,12 +130,14 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/admin/credenciales'
     | '/_authenticated/admin/usuarios'
+    | '/api/public/r2-download-url'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  ApiPublicR2DownloadUrlRoute: typeof ApiPublicR2DownloadUrlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/r2-download-url': {
+      id: '/api/public/r2-download-url'
+      path: '/api/public/r2-download-url'
+      fullPath: '/api/public/r2-download-url'
+      preLoaderRoute: typeof ApiPublicR2DownloadUrlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -211,6 +231,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  ApiPublicR2DownloadUrlRoute: ApiPublicR2DownloadUrlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

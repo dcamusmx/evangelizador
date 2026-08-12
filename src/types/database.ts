@@ -29,6 +29,14 @@ export interface ContenidoDiario {
   link_publico_pcloud: string | null;
   link_youtube: string | null;
   estado: EstadoContenido;
+  storage_provider: string | null;
+  storage_key: string | null;
+  storage_filename: string | null;
+  storage_size: number | null;
+  storage_content_type: string | null;
+  storage_etag: string | null;
+  storage_uploaded_at: string | null;
+
   subido_por: string | null;
   actualizado_por: string | null;
   created_at: string;
