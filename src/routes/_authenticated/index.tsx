@@ -124,6 +124,18 @@ function ListadoPrincipal() {
           </SelectContent>
         </Select>
 
+        <Select value={orden} onValueChange={(v) => setOrden(v as "desc" | "asc")}>
+          <SelectTrigger>
+            <SelectValue placeholder="Orden" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desc">Fecha: más reciente primero</SelectItem>
+            <SelectItem value="asc">Fecha: más antigua primero</SelectItem>
+          </SelectContent>
+        </Select>
+
+
+
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
