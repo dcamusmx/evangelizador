@@ -42,6 +42,8 @@ function ListadoPrincipal() {
   const [mes, setMes] = useState<string>("todos");
   const [estado, setEstado] = useState<string>("todos");
   const [busqueda, setBusqueda] = useState("");
+  const [orden, setOrden] = useState<"desc" | "asc">("desc");
+
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["contenido_diario", anio],
