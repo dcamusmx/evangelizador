@@ -5,7 +5,10 @@ import { generarMes } from "@/lib/n8n.functions";
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { KeyRound } from "lucide-react";
+import { KeyRound, Pencil } from "lucide-react";
+
+import { EditarRegistroDialog } from "@/components/EditarRegistroDialog";
+
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
