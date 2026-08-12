@@ -61,7 +61,7 @@ function ListadoPrincipal() {
 
   const filas = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
-    return (data ?? []).filter((r) => {
+    const lista = (data ?? []).filter((r) => {
       if (mes !== "todos" && r.fecha.slice(5, 7) !== mes) return false;
       if (estado !== "todos" && r.estado !== estado) return false;
       if (!q) return true;
@@ -69,7 +69,11 @@ function ListadoPrincipal() {
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(q));
     });
-  }, [data, mes, estado, busqueda]);
+    return lista.sort((a, b) =>
+      orden === "desc" ? b.fecha.localeCompare(a.fecha) : a.fecha.localeCompare(b.fecha),
+    );
+  }, [data, mes, estado, busqueda, orden]);
+
 
   return (
     <div className="mx-auto w-full max-w-6xl">
