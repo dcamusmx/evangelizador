@@ -169,6 +169,8 @@ function TarjetaDia({
 }) {
   const [texto, setTexto] = useState(registro.reflexion ?? "");
   const [guardando, setGuardando] = useState(false);
+  const [editando, setEditando] = useState(false);
+
 
   useEffect(() => {
     setTexto(registro.reflexion ?? "");
