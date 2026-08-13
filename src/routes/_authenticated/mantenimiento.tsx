@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { generarMes } from "@/lib/n8n.functions";
+import { publicarManual } from "@/lib/n8n.functions";
+import { GenerarMesDialog } from "@/components/GenerarMesDialog";
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { KeyRound, Pencil } from "lucide-react";
+import { KeyRound, Pencil, Send } from "lucide-react";
 
 import { EditarRegistroDialog } from "@/components/EditarRegistroDialog";
 
@@ -55,15 +56,7 @@ function Mantenimiento() {
   const inicio = `${anio}-${mes}-01`;
   const fin = new Date(Number(anio), Number(mes), 0).toISOString().slice(0, 10);
 
-  const generar = useServerFn(generarMes);
-  const mGenerar = useMutation({
-    mutationFn: () => generar({ data: { anio: Number(anio), mes: Number(mes) } }),
-    onSuccess: (r: { mensaje: string }) => {
-      toast.success(r.mensaje);
-      void queryClient.invalidateQueries({ queryKey: ["contenido_mes", anio, mes] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const [generando, setGenerando] = useState(false);
 
 
   const { data, isLoading } = useQuery({
@@ -122,14 +115,21 @@ function Mantenimiento() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => mGenerar.mutate()} disabled={mGenerar.isPending}>
-            {mGenerar.isPending ? "Generando..." : "Generar mes"}
-          </Button>
+          <Button onClick={() => setGenerando(true)}>Generar mes</Button>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Si hay un flujo externo configurado en Credenciales, se usará ese; si no, se crearán los
-          días vacíos para escribir las reflexiones.
+          Puedes importar el mes desde Vatican News (flujo externo) o desde un archivo CSV.
         </p>
+
+        <GenerarMesDialog
+          abierto={generando}
+          onOpenChange={setGenerando}
+          anio={Number(anio)}
+          mes={Number(mes)}
+          onListo={() =>
+            void queryClient.invalidateQueries({ queryKey: ["contenido_mes", anio, mes] })
+          }
+        />
 
       </div>
 
@@ -170,6 +170,12 @@ function TarjetaDia({
   const [texto, setTexto] = useState(registro.reflexion ?? "");
   const [guardando, setGuardando] = useState(false);
   const [editando, setEditando] = useState(false);
+  const publicar = useServerFn(publicarManual);
+  const mPublicar = useMutation({
+    mutationFn: () => publicar({ data: { fecha: registro.fecha } }),
+    onSuccess: (r: { mensaje: string }) => toast.success(r.mensaje),
+    onError: (e: Error) => toast.error(e.message),
+  });
 
 
   useEffect(() => {
@@ -213,6 +219,10 @@ function TarjetaDia({
           <StatusBadge estado={registro.estado} />
           <Button variant="outline" size="sm" onClick={() => setEditando(true)}>
             <Pencil className="mr-2 h-3.5 w-3.5" /> Ver / editar
+          </Button>
+          <Button size="sm" onClick={() => mPublicar.mutate()} disabled={mPublicar.isPending}>
+            <Send className="mr-2 h-3.5 w-3.5" />
+            {mPublicar.isPending ? "Publicando..." : "Publicar ahora"}
           </Button>
         </div>
       </div>

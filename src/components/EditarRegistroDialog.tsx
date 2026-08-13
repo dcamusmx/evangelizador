@@ -66,6 +66,7 @@ export function EditarRegistroDialog({
         descripcion_base: limpio(form.descripcion_base),
         reflexion: limpio(form.reflexion),
         link_youtube: limpio(form.link_youtube),
+        link_facebook: limpio(form.link_facebook),
         estado: form.estado,
         actualizado_por: userId,
       })
@@ -148,6 +149,15 @@ export function EditarRegistroDialog({
                 placeholder="https://youtu.be/..."
                 value={form.link_youtube ?? ""}
                 onChange={(e) => set("link_youtube", e.target.value)}
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="facebook">Enlace de Facebook</Label>
+              <Input
+                id="facebook"
+                placeholder="https://facebook.com/..."
+                value={form.link_facebook ?? ""}
+                onChange={(e) => set("link_facebook", e.target.value)}
               />
             </div>
             <div className="grid gap-1.5">
