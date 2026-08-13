@@ -99,7 +99,7 @@ export function GenerarMesDialog({ abierto, onOpenChange, anio, mes, onListo }: 
             const fila: FilaCsv = { fecha: (r["fecha"] ?? "").trim() };
             for (const c of COLUMNAS.slice(1)) {
               const v = (r[c] ?? "").trim();
-              if (v) (fila as Record<string, string>)[c] = v;
+              if (v) (fila as unknown as Record<string, string>)[c] = v;
             }
             return fila;
           })
