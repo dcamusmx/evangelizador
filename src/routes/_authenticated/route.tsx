@@ -96,6 +96,17 @@ function DashboardLayout() {
           </Link>
         );
       })}
+      <button
+        type="button"
+        onClick={() => {
+          onNavigate?.();
+          void cerrarSesion();
+        }}
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+      >
+        <LogOut className="h-4 w-4 shrink-0" />
+        Cerrar sesión
+      </button>
     </nav>
   );
 
@@ -113,9 +124,6 @@ function DashboardLayout() {
         <div className="mt-4 flex-1">
           <Nav />
         </div>
-        <Button variant="ghost" className="justify-start gap-3" onClick={cerrarSesion}>
-          <LogOut className="h-4 w-4" /> Cerrar sesión
-        </Button>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
