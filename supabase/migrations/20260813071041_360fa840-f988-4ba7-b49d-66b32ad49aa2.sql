@@ -1,0 +1,1 @@
+ALTER TABLE public.contenido_diario ADD COLUMN IF NOT EXISTS link_facebook text;
