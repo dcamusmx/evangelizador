@@ -13,7 +13,6 @@ export interface ResultadoGenerarMes {
   creados: number;
   existentes: number;
   mensaje: string;
-  respuesta?: unknown;
 }
 
 /**
@@ -63,7 +62,6 @@ export const generarMes = createServerFn({ method: "POST" })
           (r.texto.trim()
             ? r.texto.slice(0, 300)
             : "Se envió la solicitud al flujo de Vatican News. Los días aparecerán conforme se procesen."),
-        respuesta: r.data,
       };
     }
 
@@ -116,7 +114,6 @@ export const publicarManual = createServerFn({ method: "POST" })
     return {
       success: true as const,
       mensaje: mensaje ?? (r.texto.trim() ? r.texto.slice(0, 300) : "Publicación enviada a n8n."),
-      respuesta: r.data,
     };
   });
 
@@ -193,7 +190,7 @@ export const importarCsvMes = createServerFn({ method: "POST" })
     let actualizadas = 0;
 
     for (const { row } of aProcesar) {
-      const cambios: Record<string, unknown> = {};
+      const cambios: Record<string, string> = {};
       for (const campo of CAMPOS_TEXTO) {
         const valor = (row[campo] ?? "").toString().trim();
         if (valor !== "") cambios[campo] = valor;
@@ -209,7 +206,7 @@ export const importarCsvMes = createServerFn({ method: "POST" })
       if (!existente) {
         const { error } = await context.supabase
           .from("contenido_diario")
-          .insert({ fecha: row.fecha, ...cambios, actualizado_por: context.userId });
+          .insert({ fecha: row.fecha, ...cambios, actualizado_por: context.userId } as never);
         if (error) throw new Error("No pudimos insertar una fila del CSV.");
         insertadas++;
         continue;
@@ -236,7 +233,7 @@ export const importarCsvMes = createServerFn({ method: "POST" })
 
       const { error } = await context.supabase
         .from("contenido_diario")
-        .update(payload)
+        .update(payload as never)
         .eq("fecha", row.fecha);
       if (error) throw new Error("No pudimos actualizar una fila del CSV.");
       actualizadas++;
