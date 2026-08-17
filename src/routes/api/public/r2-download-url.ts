@@ -1,6 +1,13 @@
-// Endpoint público para n8n/Zernio: genera una Presigned GET URL (1 h) del video del día.
-// Sustituye a la Edge Function: en este stack la lógica HTTP externa vive en rutas de servidor.
-// Auth: cabecera X-N8N-API-KEY (clave interna) O Bearer JWT de un usuario admin/editor.
+// Endpoint público para n8n/Zernio: version 16-08-26 con node code
+// genera una Presigned GET URL (1 h) del video del día.
+//
+// Auth:
+// - X-N8N-API-KEY para llamadas internas desde n8n
+// - Bearer JWT para usuarios admin/editor
+//
+// Fecha:
+// - Preferida: ?fecha=AAAA-MM-DD
+// - Alternativa: JSON body { "fecha": "AAAA-MM-DD" }
 
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -22,12 +29,20 @@ function json(body: unknown, status = 200) {
 }
 
 async function autorizado(request: Request): Promise<boolean> {
+  // --------------------------------------------------
+  // 1. API KEY INTERNA DE N8N
+  // --------------------------------------------------
+
   const apiKey = request.headers.get("x-n8n-api-key");
   const esperada = process.env["N8N_INTERNAL_API_KEY"];
 
   if (apiKey && esperada && apiKey === esperada) {
     return true;
   }
+
+  // --------------------------------------------------
+  // 2. BEARER JWT
+  // --------------------------------------------------
 
   const authHeader = request.headers.get("authorization");
 
@@ -51,14 +66,14 @@ async function autorizado(request: Request): Promise<boolean> {
         input: RequestInfo | URL,
         init?: RequestInit,
       ) => {
-        const h = new Headers(init?.headers);
+        const headers = new Headers(init?.headers);
 
-        h.set("apikey", key);
-        h.set("Authorization", authHeader);
+        headers.set("apikey", key);
+        headers.set("Authorization", authHeader);
 
         return fetch(input, {
           ...init,
-          headers: h,
+          headers,
         });
       },
     },
@@ -101,9 +116,9 @@ export const Route = createFileRoute(
         }),
 
       POST: async ({ request }) => {
-        // --------------------------------------------------
+        // ==================================================
         // 1. AUTORIZACIÓN
-        // --------------------------------------------------
+        // ==================================================
 
         if (!(await autorizado(request))) {
           return json(
@@ -115,62 +130,47 @@ export const Route = createFileRoute(
           );
         }
 
-        // --------------------------------------------------
+        // ==================================================
         // 2. OBTENER FECHA
-        // --------------------------------------------------
+        // ==================================================
         //
-        // Permitimos recibir:
+        // Prioridad:
         //
-        // JSON:
-        // {
-        //   "fecha": "2026-08-01"
-        // }
+        // 1. Query parameter:
+        //    ?fecha=2026-08-01
         //
-        // O:
-        //
-        // /api/public/r2-download-url?fecha=2026-08-01
+        // 2. JSON body:
+        //    { "fecha": "2026-08-01" }
         //
 
-const requestUrl = new URL(request.url);
+        const requestUrl = new URL(request.url);
 
-const contentType = request.headers.get("content-type");
+        const fechaQuery =
+          requestUrl.searchParams.get("fecha")?.trim();
 
-let rawBody = "";
-let body: Record<string, unknown> = {};
-let parseError: string | null = null;
+        let fechaBody: string | undefined;
 
-try {
-  rawBody = await request.text();
+        // Solo intentamos leer body si no vino fecha por query.
+        if (!fechaQuery) {
+          try {
+            const body = (await request.json()) as {
+              fecha?: unknown;
+            };
 
-  if (rawBody) {
-    try {
-      body = JSON.parse(rawBody);
-    } catch (e) {
-      parseError =
-        e instanceof Error
-          ? e.message
-          : "No se pudo parsear JSON";
-    }
-  }
-} catch (e) {
-  parseError =
-    e instanceof Error
-      ? e.message
-      : "No se pudo leer el body";
-}
+            if (typeof body?.fecha === "string") {
+              fechaBody = body.fecha.trim();
+            }
+          } catch {
+            // Body opcional.
+            // No es error si la fecha llegó por query parameter.
+          }
+        }
 
-return json({
-  diagnostic: true,
-  contentType,
-  rawBody,
-  parsedBody: body,
-  parseError,
-  queryFecha: requestUrl.searchParams.get("fecha"),
-});
+        const fecha = fechaQuery || fechaBody;
 
-        // --------------------------------------------------
+        // ==================================================
         // 3. VALIDAR FECHA
-        // --------------------------------------------------
+        // ==================================================
 
         if (!fecha) {
           return json(
@@ -192,9 +192,9 @@ return json({
           );
         }
 
-        // --------------------------------------------------
-        // 4. BUSCAR REGISTRO EN SUPABASE
-        // --------------------------------------------------
+        // ==================================================
+        // 4. CONSULTAR CONTENIDO_DIARIO
+        // ==================================================
 
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
@@ -223,7 +223,7 @@ return json({
 
         if (error) {
           console.error(
-            "[r2-download-url] Error Supabase:",
+            "[r2-download-url] Error consultando Supabase:",
             error,
           );
 
@@ -231,7 +231,6 @@ return json({
             {
               success: false,
               error: "Error consultando contenido_diario",
-              details: error.message,
             },
             500,
           );
@@ -248,32 +247,34 @@ return json({
           );
         }
 
-        // --------------------------------------------------
-        // 5. VALIDAR INFORMACIÓN DEL VIDEO
-        // --------------------------------------------------
-
         const r = registro as Record<string, unknown>;
+
+        // ==================================================
+        // 5. ¿EL REGISTRO TIENE VIDEO R2?
+        // ==================================================
 
         if (
           r["storage_provider"] !== "cloudflare_r2" ||
           !r["storage_key"]
         ) {
-          return json(
-            {
-              success: true,
-              exists: false,
-              downloadUrl: null,
-              fecha: r["fecha"],
-              error:
-                "El registro no tiene un video almacenado en R2.",
-            },
-            200,
-          );
+          return json({
+            success: true,
+            exists: false,
+            downloadUrl: null,
+
+            fecha: r["fecha"],
+            estado: r["estado"],
+
+            reason: "no_storage",
+
+            message:
+              "El registro no tiene un video almacenado en R2.",
+          });
         }
 
-        // --------------------------------------------------
-        // 6. COMPROBAR OBJETO EN CLOUDFLARE R2
-        // --------------------------------------------------
+        // ==================================================
+        // 6. COMPROBAR ARCHIVO EN R2
+        // ==================================================
 
         try {
           const {
@@ -288,25 +289,28 @@ return json({
 
           const meta = await cabecerasObjeto(cfg, key);
 
-          // El registro existe en Supabase pero el archivo
-          // físico no existe en R2.
+          // Registro en Supabase existe pero archivo físico no.
           if (!meta) {
-            return json(
-              {
-                success: true,
-                exists: false,
-                downloadUrl: null,
-                fecha: r["fecha"],
-                storageKey: key,
-                error: "El video no existe en R2.",
-              },
-              200,
-            );
+            return json({
+              success: true,
+              exists: false,
+              downloadUrl: null,
+
+              fecha: r["fecha"],
+              estado: r["estado"],
+
+              reason: "object_not_found",
+
+              storageKey: key,
+
+              message:
+                "El registro existe, pero el video no existe físicamente en R2.",
+            });
           }
 
-          // --------------------------------------------------
-          // 7. GENERAR URL FIRMADA
-          // --------------------------------------------------
+          // ==================================================
+          // 7. GENERAR PRESIGNED GET URL
+          // ==================================================
 
           const expiresIn = 3600;
 
@@ -317,22 +321,20 @@ return json({
             expiresIn,
           );
 
-          // --------------------------------------------------
-          // 8. RESPUESTA
-          // --------------------------------------------------
+          // ==================================================
+          // 8. RESPUESTA EXITOSA
+          // ==================================================
 
           return json({
             success: true,
-
             exists: true,
 
             downloadUrl,
-
             expiresIn,
 
-            filename: r["storage_filename"],
-
             fecha: r["fecha"],
+
+            filename: r["storage_filename"],
 
             estado: r["estado"],
 
@@ -346,22 +348,29 @@ return json({
 
             object: {
               key,
-              contentType: meta.contentType,
-              size: meta.size,
+
+              contentType:
+                meta.contentType ||
+                r["storage_content_type"],
+
+              size:
+                meta.size ||
+                r["storage_size"],
             },
           });
-        } catch (e) {
+        } catch (error) {
           console.error(
-            "[r2-download-url] Error R2:",
-            e,
+            "[r2-download-url] Error procesando R2:",
+            error,
           );
 
           return json(
             {
               success: false,
+
               error:
-                e instanceof Error
-                  ? e.message
+                error instanceof Error
+                  ? error.message
                   : "Error desconocido procesando R2",
             },
             500,
