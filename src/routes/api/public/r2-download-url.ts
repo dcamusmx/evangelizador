@@ -131,22 +131,42 @@ export const Route = createFileRoute(
         // /api/public/r2-download-url?fecha=2026-08-01
         //
 
-        let body: { fecha?: string } = {};
+const requestUrl = new URL(request.url);
 
-        try {
-          body = (await request.json()) as {
-            fecha?: string;
-          };
-        } catch {
-          // No detenemos la ejecución porque también
-          // aceptamos fecha mediante query parameter.
-        }
+const contentType = request.headers.get("content-type");
 
-        const requestUrl = new URL(request.url);
+let rawBody = "";
+let body: Record<string, unknown> = {};
+let parseError: string | null = null;
 
-        const fecha =
-          body?.fecha?.trim() ||
-          requestUrl.searchParams.get("fecha")?.trim();
+try {
+  rawBody = await request.text();
+
+  if (rawBody) {
+    try {
+      body = JSON.parse(rawBody);
+    } catch (e) {
+      parseError =
+        e instanceof Error
+          ? e.message
+          : "No se pudo parsear JSON";
+    }
+  }
+} catch (e) {
+  parseError =
+    e instanceof Error
+      ? e.message
+      : "No se pudo leer el body";
+}
+
+return json({
+  diagnostic: true,
+  contentType,
+  rawBody,
+  parsedBody: body,
+  parseError,
+  queryFecha: requestUrl.searchParams.get("fecha"),
+});
 
         // --------------------------------------------------
         // 3. VALIDAR FECHA
