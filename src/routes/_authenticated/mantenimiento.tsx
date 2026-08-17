@@ -90,7 +90,7 @@ function Mantenimiento() {
       />
 
       <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <Select value={anio} onValueChange={setAnio}>
             <SelectTrigger>
               <SelectValue placeholder="Año" />
@@ -204,9 +204,9 @@ function TarjetaDia({
   const sinCambios = (registro.reflexion ?? "") === texto;
 
   return (
-    <article className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+    <article className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <p className="text-sm font-semibold text-foreground capitalize">
             {fechaLarga(registro.fecha)}
           </p>
@@ -215,20 +215,22 @@ function TarjetaDia({
           </p>
           <p className="text-xs text-muted-foreground">{registro.cita_evangelio ?? "—"}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:items-end">
           <StatusBadge estado={registro.estado} />
-          <Button variant="outline" size="sm" onClick={() => setEditando(true)}>
-            <Pencil className="mr-2 h-3.5 w-3.5" /> Ver / editar
-          </Button>
-          <Button size="sm" onClick={() => mPublicar.mutate()} disabled={mPublicar.isPending}>
-            <Send className="mr-2 h-3.5 w-3.5" />
-            {mPublicar.isPending ? "Publicando..." : "Publicar ahora"}
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button variant="outline" size="sm" onClick={() => setEditando(true)}>
+              <Pencil className="mr-2 h-3.5 w-3.5" /> Ver / editar
+            </Button>
+            <Button size="sm" onClick={() => mPublicar.mutate()} disabled={mPublicar.isPending}>
+              <Send className="mr-2 h-3.5 w-3.5" />
+              {mPublicar.isPending ? "Publicando..." : "Publicar ahora"}
+            </Button>
+          </div>
         </div>
       </div>
 
       <Textarea
-        className="mt-4 min-h-40"
+        className="mt-4 min-h-32 sm:min-h-40"
         placeholder="Escribe aquí la reflexión del día..."
         value={texto}
         onChange={(e) => setTexto(e.target.value)}

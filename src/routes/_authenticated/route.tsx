@@ -7,7 +7,18 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { useState } from "react";
-import { CalendarDays, Home, KeyRound, LogOut, Menu, Upload, Users, X } from "lucide-react";
+import {
+  CalendarDays,
+  Home,
+  KeyRound,
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Upload,
+  Users,
+  X,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
@@ -38,6 +49,7 @@ function DashboardLayout() {
   const { profile, user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [abierto, setAbierto] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const cerrarSesion = async () => {
@@ -75,7 +87,7 @@ function DashboardLayout() {
 
   const visibles = navItems.filter((i) => !i.adminOnly || profile.role === "admin");
 
-  const Nav = ({ onNavigate }: { onNavigate?: () => void }) => (
+  const Nav = ({ onNavigate, compact = false }: { onNavigate?: () => void; compact?: boolean }) => (
     <nav className="flex flex-col gap-1">
       {visibles.map((item) => {
         const activo = pathname === item.to;
@@ -85,14 +97,15 @@ function DashboardLayout() {
             to={item.to}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              "flex items-center rounded-lg py-2.5 text-sm font-medium transition-colors",
+              compact ? "justify-center px-2" : "gap-3 px-3",
               activo
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
           >
             <item.icon className="h-4 w-4 shrink-0" />
-            {item.label}
+            {!compact && <span>{item.label}</span>}
           </Link>
         );
       })}
@@ -102,31 +115,79 @@ function DashboardLayout() {
           onNavigate?.();
           void cerrarSesion();
         }}
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        className={cn(
+          "flex items-center rounded-lg py-2.5 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+          compact ? "justify-center px-2" : "gap-3 px-3",
+        )}
       >
         <LogOut className="h-4 w-4 shrink-0" />
-        Cerrar sesión
+        {!compact && <span>Cerrar sesión</span>}
       </button>
     </nav>
   );
 
   return (
     <div className="flex min-h-screen w-full bg-background">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 lg:flex">
-        <div className="px-2 py-4">
-          <p className="text-[10px] font-semibold tracking-[0.24em] text-accent-strong uppercase">
-            Gestión
-          </p>
-          <p className="mt-1 text-base font-semibold tracking-tight text-foreground">
-            Evangelio Diario
-          </p>
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sidebar-border bg-sidebar p-4 transition-all duration-200 lg:flex",
+          sidebarOpen ? "w-64" : "w-20",
+        )}
+      >
+        <div className={cn("flex items-center justify-between px-2 py-2", !sidebarOpen && "justify-center")}>
+          {!sidebarOpen ? (
+            <div className="flex justify-center">
+              <p className="text-[10px] font-semibold tracking-[0.24em] text-accent-strong uppercase">
+                E
+              </p>
+            </div>
+          ) : (
+            <>
+              <div>
+                <p className="text-[10px] font-semibold tracking-[0.24em] text-accent-strong uppercase">
+                  Gestión
+                </p>
+                <p className="mt-1 text-base font-semibold tracking-tight text-foreground">
+                  Evangelio Diario
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(false)}
+                aria-label="Colapsar menú"
+                className="h-8 w-8"
+              >
+                <PanelLeftClose className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
-        <div className="mt-4 flex-1">
-          <Nav />
-        </div>
+        {sidebarOpen ? (
+          <div className="mt-4 flex-1 overflow-y-auto">
+            <Nav />
+          </div>
+        ) : (
+          <div className="mt-4 flex-1 overflow-y-auto">
+            <Nav compact />
+          </div>
+        )}
+        {!sidebarOpen && (
+          <div className="mt-2 flex justify-center pb-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Expandir menú"
+              className="h-8 w-8"
+            >
+              <PanelLeftOpen className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className={cn("flex min-w-0 flex-1 flex-col transition-all duration-200", sidebarOpen ? "lg:pl-64" : "lg:pl-20")}>
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card/90 px-4 py-3 backdrop-blur sm:px-6">
           <div className="flex items-center gap-3">
             <Button
@@ -137,6 +198,15 @@ function DashboardLayout() {
               aria-label="Abrir menú"
             >
               <Menu className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden lg:inline-flex"
+              onClick={() => setSidebarOpen((value) => !value)}
+              aria-label={sidebarOpen ? "Ocultar menú" : "Mostrar menú"}
+            >
+              {sidebarOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
             </Button>
             <div className="lg:hidden">
               <p className="text-sm font-semibold text-foreground">Evangelio Diario</p>

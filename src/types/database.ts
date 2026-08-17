@@ -27,6 +27,7 @@ export interface ContenidoDiario {
   nombre_archivo_pcloud: string | null;
   fileid_pcloud: number | null;
   link_publico_pcloud: string | null;
+  link_facebook: string | null;
   link_youtube: string | null;
   estado: EstadoContenido;
   storage_provider: string | null;

@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ExternalLink, Search } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/useAuth";
 import { PageHeader, EmptyState, LoadingSpinner } from "@/components/PageHeader";
 import { CheckBadge, StatusBadge } from "@/components/StatusBadge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { EditarRegistroDialog } from "@/components/EditarRegistroDialog";
 import {
   Select,
   SelectContent,
@@ -38,12 +41,14 @@ const anioActual = new Date().getFullYear();
 const anios = [anioActual - 1, anioActual, anioActual + 1];
 
 function ListadoPrincipal() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [anio, setAnio] = useState<string>(String(anioActual));
   const [mes, setMes] = useState<string>("todos");
   const [estado, setEstado] = useState<string>("todos");
   const [busqueda, setBusqueda] = useState("");
   const [orden, setOrden] = useState<"desc" | "asc">("desc");
-
+  const [registroActivo, setRegistroActivo] = useState<ContenidoDiario | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["contenido_diario", anio],
@@ -82,7 +87,7 @@ function ListadoPrincipal() {
         descripcion="Consulta el estado de cada Evangelio: reflexión, video y publicación."
       />
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mb-4 grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         <Select value={anio} onValueChange={setAnio}>
           <SelectTrigger>
             <SelectValue placeholder="Año" />
@@ -171,7 +176,7 @@ function ListadoPrincipal() {
                 <th className="px-4 py-3 font-medium">Reflexión</th>
                 <th className="px-4 py-3 font-medium">Video</th>
                 <th className="px-4 py-3 font-medium">Publicación</th>
-                <th className="px-4 py-3 font-medium">YouTube</th>
+                <th className="px-4 py-3 font-medium">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -207,18 +212,36 @@ function ListadoPrincipal() {
                     <StatusBadge estado={r.estado} />
                   </td>
                   <td className="px-4 py-3 align-top">
-                    {r.link_youtube ? (
-                      <a
-                        href={r.link_youtube}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                    <div className="flex flex-col items-start gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setRegistroActivo(r)}
+                        className="w-full justify-center sm:w-auto"
                       >
-                        Ver en YouTube <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
+                        Ver / editar
+                      </Button>
+                      {r.link_youtube ? (
+                        <a
+                          href={r.link_youtube}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                        >
+                          Ver en YouTube <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      ) : null}
+                      {r.link_facebook ? (
+                        <a
+                          href={r.link_facebook}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                        >
+                          Ver en Facebook <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -226,6 +249,20 @@ function ListadoPrincipal() {
           </table>
         </div>
       )}
+
+      {registroActivo ? (
+        <EditarRegistroDialog
+          registro={registroActivo}
+          userId={user?.id ?? null}
+          abierto={Boolean(registroActivo)}
+          onOpenChange={(open) => {
+            if (!open) setRegistroActivo(null);
+          }}
+          onGuardado={() => {
+            void queryClient.invalidateQueries({ queryKey: ["contenido_diario", anio] });
+          }}
+        />
+      ) : null}
     </div>
   );
 }
