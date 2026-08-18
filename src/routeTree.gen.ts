@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ZerniolinksRouteImport } from './routes/zerniolinks'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedMantenimientoRouteImport } from './routes/_authenticated/mantenimiento'
 import { Route as AuthenticatedSubirRouteImport } from './routes/_authenticated/subir'
@@ -26,6 +27,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZerniolinksRoute = ZerniolinksRouteImport.update({
+  id: '/zerniolinks',
+  path: '/zerniolinks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
@@ -70,6 +76,7 @@ const ApiPublicR2DownloadUrlRoute = ApiPublicR2DownloadUrlRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/zerniolinks': typeof ZerniolinksRoute
   '/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/zerniolinks': typeof ZerniolinksRoute
   '/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/zerniolinks': typeof ZerniolinksRoute
   '/_authenticated/mantenimiento': typeof AuthenticatedMantenimientoRoute
   '/_authenticated/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/zerniolinks'
     | '/mantenimiento'
     | '/subir'
     | '/auth/callback'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/zerniolinks'
     | '/mantenimiento'
     | '/subir'
     | '/auth/callback'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/zerniolinks'
     | '/_authenticated/mantenimiento'
     | '/_authenticated/subir'
     | '/auth/callback'
@@ -136,6 +148,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ZerniolinksRoute: typeof ZerniolinksRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   ApiPublicR2DownloadUrlRoute: typeof ApiPublicR2DownloadUrlRoute
 }
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zerniolinks': {
+      id: '/zerniolinks'
+      path: '/zerniolinks'
+      fullPath: '/zerniolinks'
+      preLoaderRoute: typeof ZerniolinksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
@@ -230,6 +250,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  ZerniolinksRoute: ZerniolinksRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   ApiPublicR2DownloadUrlRoute: ApiPublicR2DownloadUrlRoute,
 }
