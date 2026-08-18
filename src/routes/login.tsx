@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,29 +71,22 @@ function LoginPage() {
     setEnviandoGoogle(true);
 
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth/callback`,
+      // Supabase gestiona el redirect a Google y de vuelta; el navegador sale de esta página.
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
-      // El navegador está siendo redirigido al proveedor OAuth.
-      if (result.redirected) return;
-
-      if (result.error) {
-        console.error(result.error);
+      if (error) {
+        console.error(error);
         toast.error("No pudimos iniciar sesión con Google.");
-        return;
+        setEnviandoGoogle(false);
       }
-
-      toast.success("Sesión iniciada correctamente.");
-
-      void navigate({
-        to: "/",
-        replace: true,
-      });
     } catch (error) {
       console.error(error);
       toast.error("Ocurrió un error al iniciar sesión con Google.");
-    } finally {
       setEnviandoGoogle(false);
     }
   };
