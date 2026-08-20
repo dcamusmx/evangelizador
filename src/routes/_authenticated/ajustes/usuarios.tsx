@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ROLE_LABEL, type Profile, type UserRole } from "@/types/database";
 
-export const Route = createFileRoute("/_authenticated/admin/usuarios")({
+export const Route = createFileRoute("/_authenticated/ajustes/usuarios")({
   head: () => ({
     meta: [
       { title: "Usuarios — Evangelio Diario" },

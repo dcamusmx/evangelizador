@@ -26,28 +26,28 @@ import {
 } from "@/components/ui/select";
 import { MESES, fechaLarga, type ContenidoDiario } from "@/types/database";
 
-export const Route = createFileRoute("/_authenticated/mantenimiento")({
+export const Route = createFileRoute("/_authenticated/publicaciones")({
   head: () => ({
     meta: [
-      { title: "Mantenimiento — Evangelio Diario" },
+      { title: "Publicaciones — Evangelio Diario" },
       {
         name: "description",
         content: "Genera el calendario mensual y escribe las reflexiones de cada día.",
       },
-      { property: "og:title", content: "Mantenimiento — Evangelio Diario" },
+      { property: "og:title", content: "Publicaciones — Evangelio Diario" },
       {
         property: "og:description",
         content: "Genera el calendario mensual y escribe las reflexiones de cada día.",
       },
     ],
   }),
-  component: Mantenimiento,
+  component: Publicaciones,
 });
 
 const hoy = new Date();
 const anios = [hoy.getFullYear() - 1, hoy.getFullYear(), hoy.getFullYear() + 1];
 
-function Mantenimiento() {
+function Publicaciones() {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [anio, setAnio] = useState(String(hoy.getFullYear()));
@@ -76,12 +76,12 @@ function Mantenimiento() {
   return (
     <div className="mx-auto w-full max-w-4xl">
       <PageHeader
-        titulo="Mantenimiento"
+        titulo="Publicaciones"
         descripcion="Selecciona un mes para revisar y escribir las reflexiones."
         acciones={
           profile?.role === "admin" ? (
             <Button variant="outline" asChild>
-              <Link to="/admin/credenciales">
+              <Link to="/ajustes/credenciales">
                 <KeyRound className="mr-2 h-4 w-4" /> Credenciales
               </Link>
             </Button>

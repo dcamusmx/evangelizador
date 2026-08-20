@@ -27,7 +27,7 @@ import {
 } from "@/lib/credenciales.functions";
 import { probarCredencialR2 } from "@/lib/r2.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/credenciales")({
+export const Route = createFileRoute("/_authenticated/ajustes/credenciales")({
   head: () => ({
     meta: [
       { title: "Credenciales — Evangelio Diario" },

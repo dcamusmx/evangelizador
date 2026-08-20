@@ -13,11 +13,13 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ZerniolinksRouteImport } from './routes/zerniolinks'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedMantenimientoRouteImport } from './routes/_authenticated/mantenimiento'
+import { Route as AuthenticatedListadoRouteImport } from './routes/_authenticated/listado'
+import { Route as AuthenticatedPublicacionesRouteImport } from './routes/_authenticated/publicaciones'
 import { Route as AuthenticatedSubirRouteImport } from './routes/_authenticated/subir'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AuthenticatedAdminCredencialesRouteImport } from './routes/_authenticated/admin.credenciales'
-import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
+import { Route as AuthenticatedAjustesIndexRouteImport } from './routes/_authenticated/ajustes/index'
+import { Route as AuthenticatedAjustesCredencialesRouteImport } from './routes/_authenticated/ajustes/credenciales'
+import { Route as AuthenticatedAjustesUsuariosRouteImport } from './routes/_authenticated/ajustes/usuarios'
 import { Route as ApiPublicR2DownloadUrlRouteImport } from './routes/api/public/r2-download-url'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -39,10 +41,15 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedMantenimientoRoute =
-  AuthenticatedMantenimientoRouteImport.update({
-    id: '/mantenimiento',
-    path: '/mantenimiento',
+const AuthenticatedListadoRoute = AuthenticatedListadoRouteImport.update({
+  id: '/listado',
+  path: '/listado',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPublicacionesRoute =
+  AuthenticatedPublicacionesRouteImport.update({
+    id: '/publicaciones',
+    path: '/publicaciones',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedSubirRoute = AuthenticatedSubirRouteImport.update({
@@ -55,16 +62,22 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminCredencialesRoute =
-  AuthenticatedAdminCredencialesRouteImport.update({
-    id: '/admin/credenciales',
-    path: '/admin/credenciales',
+const AuthenticatedAjustesIndexRoute =
+  AuthenticatedAjustesIndexRouteImport.update({
+    id: '/ajustes/',
+    path: '/ajustes/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedAdminUsuariosRoute =
-  AuthenticatedAdminUsuariosRouteImport.update({
-    id: '/admin/usuarios',
-    path: '/admin/usuarios',
+const AuthenticatedAjustesCredencialesRoute =
+  AuthenticatedAjustesCredencialesRouteImport.update({
+    id: '/ajustes/credenciales',
+    path: '/ajustes/credenciales',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAjustesUsuariosRoute =
+  AuthenticatedAjustesUsuariosRouteImport.update({
+    id: '/ajustes/usuarios',
+    path: '/ajustes/usuarios',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ApiPublicR2DownloadUrlRoute = ApiPublicR2DownloadUrlRouteImport.update({
@@ -77,36 +90,42 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
-  '/mantenimiento': typeof AuthenticatedMantenimientoRoute
+  '/listado': typeof AuthenticatedListadoRoute
+  '/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
-  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/ajustes/credenciales': typeof AuthenticatedAjustesCredencialesRoute
+  '/ajustes/usuarios': typeof AuthenticatedAjustesUsuariosRoute
   '/api/public/r2-download-url': typeof ApiPublicR2DownloadUrlRoute
+  '/ajustes/': typeof AuthenticatedAjustesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
-  '/mantenimiento': typeof AuthenticatedMantenimientoRoute
+  '/listado': typeof AuthenticatedListadoRoute
+  '/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/': typeof AuthenticatedIndexRoute
-  '/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
-  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/ajustes/credenciales': typeof AuthenticatedAjustesCredencialesRoute
+  '/ajustes/usuarios': typeof AuthenticatedAjustesUsuariosRoute
   '/api/public/r2-download-url': typeof ApiPublicR2DownloadUrlRoute
+  '/ajustes': typeof AuthenticatedAjustesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
-  '/_authenticated/mantenimiento': typeof AuthenticatedMantenimientoRoute
+  '/_authenticated/listado': typeof AuthenticatedListadoRoute
+  '/_authenticated/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/_authenticated/subir': typeof AuthenticatedSubirRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/admin/credenciales': typeof AuthenticatedAdminCredencialesRoute
-  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/ajustes/credenciales': typeof AuthenticatedAjustesCredencialesRoute
+  '/_authenticated/ajustes/usuarios': typeof AuthenticatedAjustesUsuariosRoute
   '/api/public/r2-download-url': typeof ApiPublicR2DownloadUrlRoute
+  '/_authenticated/ajustes/': typeof AuthenticatedAjustesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -114,35 +133,41 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/zerniolinks'
-    | '/mantenimiento'
+    | '/listado'
+    | '/publicaciones'
     | '/subir'
     | '/auth/callback'
-    | '/admin/credenciales'
-    | '/admin/usuarios'
+    | '/ajustes/credenciales'
+    | '/ajustes/usuarios'
     | '/api/public/r2-download-url'
+    | '/ajustes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/zerniolinks'
-    | '/mantenimiento'
+    | '/listado'
+    | '/publicaciones'
     | '/subir'
     | '/auth/callback'
     | '/'
-    | '/admin/credenciales'
-    | '/admin/usuarios'
+    | '/ajustes/credenciales'
+    | '/ajustes/usuarios'
     | '/api/public/r2-download-url'
+    | '/ajustes'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/zerniolinks'
-    | '/_authenticated/mantenimiento'
+    | '/_authenticated/listado'
+    | '/_authenticated/publicaciones'
     | '/_authenticated/subir'
     | '/auth/callback'
     | '/_authenticated/'
-    | '/_authenticated/admin/credenciales'
-    | '/_authenticated/admin/usuarios'
+    | '/_authenticated/ajustes/credenciales'
+    | '/_authenticated/ajustes/usuarios'
     | '/api/public/r2-download-url'
+    | '/_authenticated/ajustes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,11 +208,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/mantenimiento': {
-      id: '/_authenticated/mantenimiento'
-      path: '/mantenimiento'
-      fullPath: '/mantenimiento'
-      preLoaderRoute: typeof AuthenticatedMantenimientoRouteImport
+    '/_authenticated/listado': {
+      id: '/_authenticated/listado'
+      path: '/listado'
+      fullPath: '/listado'
+      preLoaderRoute: typeof AuthenticatedListadoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/publicaciones': {
+      id: '/_authenticated/publicaciones'
+      path: '/publicaciones'
+      fullPath: '/publicaciones'
+      preLoaderRoute: typeof AuthenticatedPublicacionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/subir': {
@@ -204,18 +236,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin/credenciales': {
-      id: '/_authenticated/admin/credenciales'
-      path: '/admin/credenciales'
-      fullPath: '/admin/credenciales'
-      preLoaderRoute: typeof AuthenticatedAdminCredencialesRouteImport
+    '/_authenticated/ajustes/': {
+      id: '/_authenticated/ajustes/'
+      path: '/ajustes'
+      fullPath: '/ajustes/'
+      preLoaderRoute: typeof AuthenticatedAjustesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/usuarios': {
-      id: '/_authenticated/admin/usuarios'
-      path: '/admin/usuarios'
-      fullPath: '/admin/usuarios'
-      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+    '/_authenticated/ajustes/credenciales': {
+      id: '/_authenticated/ajustes/credenciales'
+      path: '/ajustes/credenciales'
+      fullPath: '/ajustes/credenciales'
+      preLoaderRoute: typeof AuthenticatedAjustesCredencialesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ajustes/usuarios': {
+      id: '/_authenticated/ajustes/usuarios'
+      path: '/ajustes/usuarios'
+      fullPath: '/ajustes/usuarios'
+      preLoaderRoute: typeof AuthenticatedAjustesUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/r2-download-url': {
@@ -229,19 +268,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedMantenimientoRoute: typeof AuthenticatedMantenimientoRoute
+  AuthenticatedListadoRoute: typeof AuthenticatedListadoRoute
+  AuthenticatedPublicacionesRoute: typeof AuthenticatedPublicacionesRoute
   AuthenticatedSubirRoute: typeof AuthenticatedSubirRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedAdminCredencialesRoute: typeof AuthenticatedAdminCredencialesRoute
-  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedAjustesCredencialesRoute: typeof AuthenticatedAjustesCredencialesRoute
+  AuthenticatedAjustesUsuariosRoute: typeof AuthenticatedAjustesUsuariosRoute
+  AuthenticatedAjustesIndexRoute: typeof AuthenticatedAjustesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedMantenimientoRoute: AuthenticatedMantenimientoRoute,
+  AuthenticatedListadoRoute: AuthenticatedListadoRoute,
+  AuthenticatedPublicacionesRoute: AuthenticatedPublicacionesRoute,
   AuthenticatedSubirRoute: AuthenticatedSubirRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedAdminCredencialesRoute: AuthenticatedAdminCredencialesRoute,
-  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+  AuthenticatedAjustesCredencialesRoute: AuthenticatedAjustesCredencialesRoute,
+  AuthenticatedAjustesUsuariosRoute: AuthenticatedAjustesUsuariosRoute,
+  AuthenticatedAjustesIndexRoute: AuthenticatedAjustesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

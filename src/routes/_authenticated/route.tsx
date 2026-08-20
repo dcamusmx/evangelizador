@@ -10,13 +10,12 @@ import { useState } from "react";
 import {
   CalendarDays,
   Home,
-  KeyRound,
   LogOut,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Settings,
   Upload,
-  Users,
   X,
 } from "lucide-react";
 
@@ -40,9 +39,9 @@ export const Route = createFileRoute("/_authenticated")({
 const navItems = [
   { to: "/", label: "Inicio", icon: Home, adminOnly: false },
   { to: "/subir", label: "Subir video", icon: Upload, adminOnly: false },
-  { to: "/mantenimiento", label: "Mantenimiento", icon: CalendarDays, adminOnly: false },
-  { to: "/admin/usuarios", label: "Usuarios", icon: Users, adminOnly: true },
-  { to: "/admin/credenciales", label: "Credenciales", icon: KeyRound, adminOnly: true },
+  { to: "/listado", label: "Listado", icon: CalendarDays, adminOnly: false },
+  { to: "/publicaciones", label: "Publicaciones", icon: CalendarDays, adminOnly: false },
+  { to: "/ajustes", label: "Ajustes", icon: Settings, adminOnly: false },
 ] as const;
 
 function DashboardLayout() {
@@ -90,7 +89,7 @@ function DashboardLayout() {
   const Nav = ({ onNavigate, compact = false }: { onNavigate?: () => void; compact?: boolean }) => (
     <nav className="flex flex-col gap-1">
       {visibles.map((item) => {
-        const activo = pathname === item.to;
+        const activo = pathname === item.to || pathname.startsWith(`${item.to}/`);
         return (
           <Link
             key={item.to}
