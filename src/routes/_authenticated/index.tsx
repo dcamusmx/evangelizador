@@ -157,22 +157,7 @@ function HomeDashboard() {
   const mPublicarActual = useMutation({
     mutationFn: async () => {
       if (!registroActual) throw new Error("No hay un registro para hoy.");
-
-      const resultado = await publicarActual({ data: { fecha: registroActual.fecha } });
-
-      const { error } = await supabase
-        .from("contenido_diario")
-        .update({
-          estado: "publicado",
-          actualizado_por: user?.id ?? null,
-        })
-        .eq("fecha", registroActual.fecha);
-
-      if (error) throw new Error("No pudimos marcar como publicado el registro del día actual.");
-
-      return {
-        mensaje: `${resultado.mensaje} Estado actualizado a publicado.`,
-      };
+      return publicarActual({ data: { fecha: registroActual.fecha } });
     },
     onSuccess: (r: { mensaje: string }) => {
       toast.success(r.mensaje);
@@ -341,6 +326,10 @@ function HomeDashboard() {
               <p>
                 <span className="font-medium text-foreground">Estado:</span>{" "}
                 {registroSiguiente.estado}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Video:</span>{" "}
+                {registroSiguiente.storage_key ? "Video listo para publicar" : "Sin video"}
               </p>
               <p>
                 <span className="font-medium text-foreground">Reflexión:</span>{" "}
