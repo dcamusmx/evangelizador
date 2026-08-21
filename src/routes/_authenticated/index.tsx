@@ -89,6 +89,7 @@ function HomeDashboard() {
 
   const registroActual = registros[hoyIso] ?? null;
   const registroSiguiente = registros[mananaIso] ?? null;
+  const estaPublicado = registroActual?.estado === "publicado";
 
   useEffect(() => {
     if (registroActual) {
@@ -152,6 +153,34 @@ function HomeDashboard() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const publicarActual = useServerFn(publicarManual);
+  const mPublicarActual = useMutation({
+    mutationFn: async () => {
+      if (!registroActual) throw new Error("No hay un registro para hoy.");
+
+      const resultado = await publicarActual({ data: { fecha: registroActual.fecha } });
+
+      const { error } = await supabase
+        .from("contenido_diario")
+        .update({
+          estado: "publicado",
+          actualizado_por: user?.id ?? null,
+        })
+        .eq("fecha", registroActual.fecha);
+
+      if (error) throw new Error("No pudimos marcar como publicado el registro del día actual.");
+
+      return {
+        mensaje: `${resultado.mensaje} Estado actualizado a publicado.`,
+      };
+    },
+    onSuccess: (r: { mensaje: string }) => {
+      toast.success(r.mensaje);
+      void queryClient.invalidateQueries({ queryKey: ["home_dashboard", hoyIso, mananaIso] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const links = [
     { to: "/subir", label: "Subir video", icon: Upload },
     { to: "/listado", label: "Listado", icon: ListFilter },
@@ -171,10 +200,16 @@ function HomeDashboard() {
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-lg font-semibold text-foreground">Registro del día actual</h2>
             {registroActual ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Publicado
-              </span>
+              estaPublicado ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Publicado
+                </span>
+              ) : (
+                <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">
+                  Sin publicar
+                </span>
+              )
             ) : (
               <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">
                 Pendiente
@@ -207,6 +242,16 @@ function HomeDashboard() {
               </div>
 
               <div className="flex flex-wrap gap-2">
+                {!estaPublicado ? (
+                  <Button
+                    size="sm"
+                    onClick={() => mPublicarActual.mutate()}
+                    disabled={mPublicarActual.isPending}
+                  >
+                    <Send className="mr-2 h-3.5 w-3.5" />
+                    {mPublicarActual.isPending ? "Publicando..." : "Publicar"}
+                  </Button>
+                ) : null}
                 {registroActual.link_youtube ? (
                   <a href={registroActual.link_youtube} target="_blank" rel="noreferrer">
                     <Button variant="outline" size="sm" className="gap-2">

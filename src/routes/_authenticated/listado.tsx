@@ -203,7 +203,7 @@ function ListadoPrincipal() {
                   </td>
                   <td className="px-4 py-3 align-top">
                     <CheckBadge
-                      ok={Boolean(r.fileid_pcloud)}
+                      ok={Boolean(r.storage_key || r.fileid_pcloud)}
                       okLabel="Subido"
                       pendingLabel="Pendiente"
                     />
