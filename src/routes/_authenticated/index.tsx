@@ -35,7 +35,12 @@ const hoy = new Date();
 const manana = new Date(hoy);
 manana.setDate(hoy.getDate() + 1);
 
-const iso = (date: Date) => date.toISOString().slice(0, 10);
+const iso = (date: Date) => {
+  const anio = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, "0");
+  const dia = String(date.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
+};
 const fechaLocal = (date: Date) =>
   date.toLocaleDateString("es-MX", {
     day: "2-digit",

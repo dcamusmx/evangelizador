@@ -54,7 +54,13 @@ function Publicaciones() {
   const [mes, setMes] = useState(String(hoy.getMonth() + 1).padStart(2, "0"));
 
   const inicio = `${anio}-${mes}-01`;
-  const fin = new Date(Number(anio), Number(mes), 0).toISOString().slice(0, 10);
+  const fin = (() => {
+    const ultimoDia = new Date(Number(anio), Number(mes), 0);
+    const anioFin = ultimoDia.getFullYear();
+    const mesFin = String(ultimoDia.getMonth() + 1).padStart(2, "0");
+    const diaFin = String(ultimoDia.getDate()).padStart(2, "0");
+    return `${anioFin}-${mesFin}-${diaFin}`;
+  })();
 
   const [generando, setGenerando] = useState(false);
 
