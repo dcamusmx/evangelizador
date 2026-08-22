@@ -8,6 +8,50 @@ export type EstadoContenido =
   | "publicado"
   | "error";
 
+export const ESTADOS_PUBLICABLES = ["listo_para_publicar"] as const;
+export const ESTADOS_BLOQUEADOS_N8N = ["publicado", "programado"] as const;
+
+export function estadoPermitePublicacion(estado?: EstadoContenido | string | null): boolean {
+  return estado === "listo_para_publicar";
+}
+
+export function estadoBloqueadoParaN8n(estado?: EstadoContenido | string | null): boolean {
+  return estado === "publicado" || estado === "programado";
+}
+
+export function derivarEstadoContenido(params: {
+  reflexion?: string | null;
+  storage_key?: string | null;
+  fileid_pcloud?: number | null;
+  estadoActual?: EstadoContenido | string | null;
+}): EstadoContenido {
+  const { reflexion, storage_key, fileid_pcloud, estadoActual } = params;
+
+  if (estadoActual === "publicado" || estadoActual === "programado") {
+    return estadoActual as EstadoContenido;
+  }
+
+  if (!reflexion?.trim()) return "pendiente_reflexion";
+  if (!storage_key && !fileid_pcloud) return "pendiente_video";
+  return "listo_para_publicar";
+}
+
+export function fechaLocalISO(date: Date): string {
+  const anio = date.getFullYear();
+  const mes = String(date.getMonth() + 1).padStart(2, "0");
+  const dia = String(date.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
+}
+
+export function rangoMesLocal(anio: number, mes: number): { inicio: string; fin: string } {
+  const inicio = new Date(anio, mes - 1, 1);
+  const fin = new Date(anio, mes, 0);
+  return {
+    inicio: fechaLocalISO(inicio),
+    fin: fechaLocalISO(fin),
+  };
+}
+
 export interface Profile {
   id: string;
   email: string | null;

@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { useState } from "react";
 import {
+  BarChart3,
   CalendarDays,
   Home,
   LogOut,
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/_authenticated")({
 
 const navItems = [
   { to: "/", label: "Inicio", icon: Home, adminOnly: false },
+  { to: "/dashboard", label: "Dashboard", icon: BarChart3, adminOnly: false },
   { to: "/subir", label: "Subir video", icon: Upload, adminOnly: false },
   { to: "/listado", label: "Listado", icon: CalendarDays, adminOnly: false },
   { to: "/publicaciones", label: "Publicaciones", icon: CalendarDays, adminOnly: false },

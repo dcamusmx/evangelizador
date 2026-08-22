@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { estadoBloqueadoParaN8n, estadoPermitePublicacion } from "@/types/database";
 
 async function exigirStaff(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("is_staff", { _user_id: context.userId });
@@ -100,6 +101,24 @@ export const publicarManual = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await exigirStaff(context);
+
+    const { data: registro, error: errorRegistro } = await context.supabase
+      .from("contenido_diario")
+      .select("fecha, estado")
+      .eq("fecha", data.fecha)
+      .maybeSingle();
+
+    if (errorRegistro) throw new Error("No pudimos verificar el estado del registro para publicar.");
+    if (!registro) throw new Error("No existe un registro para esta fecha.");
+    if (!estadoPermitePublicacion(registro.estado)) {
+      throw new Error(
+        "Este registro no está listo para publicar. Debe estar en estado 'listo_para_publicar'.",
+      );
+    }
+    if (estadoBloqueadoParaN8n(registro.estado)) {
+      throw new Error("Este registro ya está publicado o programado, y no se puede volver a publicar.");
+    }
+
     const { obtenerWebhookPublicarManual, postN8n } = await import("@/lib/n8n.server");
     const cfg = await obtenerWebhookPublicarManual();
     if (!cfg)

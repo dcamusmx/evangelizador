@@ -24,7 +24,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MESES, fechaLarga, type ContenidoDiario } from "@/types/database";
+import {
+  MESES,
+  derivarEstadoContenido,
+  estadoPermitePublicacion,
+  fechaLarga,
+  rangoMesLocal,
+  type ContenidoDiario,
+} from "@/types/database";
 
 export const Route = createFileRoute("/_authenticated/publicaciones")({
   head: () => ({
@@ -53,14 +60,7 @@ function Publicaciones() {
   const [anio, setAnio] = useState(String(hoy.getFullYear()));
   const [mes, setMes] = useState(String(hoy.getMonth() + 1).padStart(2, "0"));
 
-  const inicio = `${anio}-${mes}-01`;
-  const fin = (() => {
-    const ultimoDia = new Date(Number(anio), Number(mes), 0);
-    const anioFin = ultimoDia.getFullYear();
-    const mesFin = String(ultimoDia.getMonth() + 1).padStart(2, "0");
-    const diaFin = String(ultimoDia.getDate()).padStart(2, "0");
-    return `${anioFin}-${mesFin}-${diaFin}`;
-  })();
+  const { inicio, fin } = rangoMesLocal(Number(anio), Number(mes));
 
   const [generando, setGenerando] = useState(false);
 
@@ -178,7 +178,12 @@ function TarjetaDia({
   const [editando, setEditando] = useState(false);
   const publicar = useServerFn(publicarManual);
   const mPublicar = useMutation({
-    mutationFn: () => publicar({ data: { fecha: registro.fecha } }),
+    mutationFn: () => {
+      if (!estadoPermitePublicacion(registro.estado)) {
+        throw new Error("Este registro no está listo para publicar.");
+      }
+      return publicar({ data: { fecha: registro.fecha } });
+    },
     onSuccess: (r: { mensaje: string }) => toast.success(r.mensaje),
     onError: (e: Error) => toast.error(e.message),
   });
@@ -190,10 +195,18 @@ function TarjetaDia({
 
   const guardar = async () => {
     setGuardando(true);
+    const siguienteEstado = derivarEstadoContenido({
+      reflexion: texto,
+      storage_key: registro.storage_key,
+      fileid_pcloud: registro.fileid_pcloud,
+      estadoActual: registro.estado,
+    });
+
     const { error } = await supabase
       .from("contenido_diario")
       .update({
         reflexion: texto.trim() === "" ? null : texto,
+        estado: siguienteEstado,
         actualizado_por: userId,
       })
       .eq("fecha", registro.fecha);
@@ -227,7 +240,11 @@ function TarjetaDia({
             <Button variant="outline" size="sm" onClick={() => setEditando(true)}>
               <Pencil className="mr-2 h-3.5 w-3.5" /> Ver / editar
             </Button>
-            <Button size="sm" onClick={() => mPublicar.mutate()} disabled={mPublicar.isPending}>
+            <Button
+              size="sm"
+              onClick={() => mPublicar.mutate()}
+              disabled={mPublicar.isPending || !estadoPermitePublicacion(registro.estado)}
+            >
               <Send className="mr-2 h-3.5 w-3.5" />
               {mPublicar.isPending ? "Publicando..." : "Publicar ahora"}
             </Button>

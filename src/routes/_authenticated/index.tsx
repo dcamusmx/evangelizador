@@ -29,18 +29,13 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/lib/useAuth";
 import { publicarManual } from "@/lib/n8n.functions";
-import type { ContenidoDiario } from "@/types/database";
+import { estadoPermitePublicacion, fechaLocalISO, type ContenidoDiario } from "@/types/database";
 
 const hoy = new Date();
 const manana = new Date(hoy);
 manana.setDate(hoy.getDate() + 1);
 
-const iso = (date: Date) => {
-  const anio = date.getFullYear();
-  const mes = String(date.getMonth() + 1).padStart(2, "0");
-  const dia = String(date.getDate()).padStart(2, "0");
-  return `${anio}-${mes}-${dia}`;
-};
+const iso = fechaLocalISO;
 const fechaLocal = (date: Date) =>
   date.toLocaleDateString("es-MX", {
     day: "2-digit",
@@ -95,6 +90,12 @@ function HomeDashboard() {
   const registroActual = registros[hoyIso] ?? null;
   const registroSiguiente = registros[mananaIso] ?? null;
   const estaPublicado = registroActual?.estado === "publicado";
+  const puedePublicarActual = Boolean(
+    registroActual && estadoPermitePublicacion(registroActual.estado),
+  );
+  const puedePublicarSiguiente = Boolean(
+    registroSiguiente && estadoPermitePublicacion(registroSiguiente.estado),
+  );
 
   useEffect(() => {
     if (registroActual) {
@@ -150,7 +151,12 @@ function HomeDashboard() {
 
   const publicarSiguiente = useServerFn(publicarManual);
   const mPublicarSiguiente = useMutation({
-    mutationFn: () => publicarSiguiente({ data: { fecha: registroSiguiente!.fecha } }),
+    mutationFn: () => {
+      if (!registroSiguiente || !estadoPermitePublicacion(registroSiguiente.estado)) {
+        throw new Error("Este registro no está listo para publicar.");
+      }
+      return publicarSiguiente({ data: { fecha: registroSiguiente.fecha } });
+    },
     onSuccess: (r: { mensaje: string }) => {
       toast.success(r.mensaje);
       void queryClient.invalidateQueries({ queryKey: ["home_dashboard", hoyIso, mananaIso] });
@@ -162,6 +168,9 @@ function HomeDashboard() {
   const mPublicarActual = useMutation({
     mutationFn: async () => {
       if (!registroActual) throw new Error("No hay un registro para hoy.");
+      if (!estadoPermitePublicacion(registroActual.estado)) {
+        throw new Error("Este registro no está listo para publicar.");
+      }
       return publicarActual({ data: { fecha: registroActual.fecha } });
     },
     onSuccess: (r: { mensaje: string }) => {
@@ -236,7 +245,7 @@ function HomeDashboard() {
                   <Button
                     size="sm"
                     onClick={() => mPublicarActual.mutate()}
-                    disabled={mPublicarActual.isPending}
+                    disabled={mPublicarActual.isPending || !puedePublicarActual}
                   >
                     <Send className="mr-2 h-3.5 w-3.5" />
                     {mPublicarActual.isPending ? "Publicando..." : "Publicar"}
@@ -352,7 +361,7 @@ function HomeDashboard() {
                 <Button
                   size="sm"
                   onClick={() => mPublicarSiguiente.mutate()}
-                  disabled={mPublicarSiguiente.isPending}
+                  disabled={mPublicarSiguiente.isPending || !puedePublicarSiguiente}
                 >
                   <Send className="mr-2 h-3.5 w-3.5" />
                   {mPublicarSiguiente.isPending ? "Publicando..." : "Publicar"}

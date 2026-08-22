@@ -13,6 +13,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ZerniolinksRouteImport } from './routes/zerniolinks'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedListadoRouteImport } from './routes/_authenticated/listado'
 import { Route as AuthenticatedPublicacionesRouteImport } from './routes/_authenticated/publicaciones'
 import { Route as AuthenticatedSubirRouteImport } from './routes/_authenticated/subir'
@@ -39,6 +40,11 @@ const ZerniolinksRoute = ZerniolinksRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedListadoRoute = AuthenticatedListadoRouteImport.update({
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/listado': typeof AuthenticatedListadoRoute
   '/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/subir': typeof AuthenticatedSubirRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/listado': typeof AuthenticatedListadoRoute
   '/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/subir': typeof AuthenticatedSubirRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/listado': typeof AuthenticatedListadoRoute
   '/_authenticated/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/_authenticated/subir': typeof AuthenticatedSubirRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/zerniolinks'
+    | '/dashboard'
     | '/listado'
     | '/publicaciones'
     | '/subir'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/zerniolinks'
+    | '/dashboard'
     | '/listado'
     | '/publicaciones'
     | '/subir'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/zerniolinks'
+    | '/_authenticated/dashboard'
     | '/_authenticated/listado'
     | '/_authenticated/publicaciones'
     | '/_authenticated/subir'
@@ -206,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/listado': {
@@ -268,6 +287,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedListadoRoute: typeof AuthenticatedListadoRoute
   AuthenticatedPublicacionesRoute: typeof AuthenticatedPublicacionesRoute
   AuthenticatedSubirRoute: typeof AuthenticatedSubirRoute
@@ -278,6 +298,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedListadoRoute: AuthenticatedListadoRoute,
   AuthenticatedPublicacionesRoute: AuthenticatedPublicacionesRoute,
   AuthenticatedSubirRoute: AuthenticatedSubirRoute,

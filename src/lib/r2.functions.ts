@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { EXPIRA_DESCARGA, EXPIRA_SUBIDA, TAMANO_MAXIMO_BYTES } from "@/lib/r2.constants";
+import { derivarEstadoContenido } from "@/types/database";
 
 async function exigirStaff(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("is_staff", { _user_id: context.userId });
@@ -82,7 +83,12 @@ export const confirmarSubidaR2 = createServerFn({ method: "POST" })
       .eq("fecha", data.fecha)
       .maybeSingle();
 
-    const estado = fila?.reflexion ? "listo_para_publicar" : "pendiente_reflexion";
+    const estado = derivarEstadoContenido({
+      reflexion: fila?.reflexion,
+      storage_key: data.objectKey,
+      fileid_pcloud: null,
+      estadoActual: fila?.estado ?? null,
+    });
     const nombre = data.objectKey.split("/").pop() ?? data.objectKey;
 
     const { error } = await context.supabase.from("contenido_diario").upsert(
