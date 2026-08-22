@@ -94,9 +94,32 @@ export interface EvangelioRegistro {
   santo_o_tiempo_liturgico: string | null;
   cita_evangelio: string | null;
   titulo: string | null;
-  descripcion_base: string | null;
+  fuente: string | null;
+  descripcion_base?: string | null;
   created_at?: string;
   updated_at?: string;
+}
+
+export function mapEvangelioRow(
+  row: Partial<EvangelioRegistro> & {
+    santo_tiempo?: string | null;
+    evangelio?: string | null;
+    fuente?: string | null;
+  },
+): EvangelioRegistro {
+  const fuente = row.fuente ?? row.descripcion_base ?? null;
+
+  return {
+    id: row.id,
+    fecha: row.fecha ?? "",
+    santo_o_tiempo_liturgico: row.santo_o_tiempo_liturgico ?? row.santo_tiempo ?? null,
+    cita_evangelio: row.cita_evangelio ?? row.evangelio ?? null,
+    titulo: row.titulo ?? null,
+    fuente,
+    descripcion_base: fuente,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
 }
 
 export const ESTADO_LABEL: Record<EstadoContenido, string> = {

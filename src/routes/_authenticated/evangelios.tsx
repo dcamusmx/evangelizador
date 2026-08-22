@@ -31,6 +31,7 @@ import {
   construirTituloEvangelio,
   fechaLarga,
   formatoFechaBarra,
+  mapEvangelioRow,
   rangoMesLocal,
   type EvangelioRegistro,
 } from "@/types/database";
@@ -54,13 +55,15 @@ export const Route = createFileRoute("/_authenticated/evangelios")({
 });
 
 const hoy = new Date();
-const anios = [hoy.getFullYear() - 1, hoy.getFullYear(), hoy.getFullYear() + 1];
+const anios = [2025, 2026, 2027, 2028];
+const MES_INICIAL_CON_DATOS = "09";
+const ANIO_INICIAL_CON_DATOS = "2026";
 
 function EvangeliosPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [anio, setAnio] = useState(String(hoy.getFullYear()));
-  const [mes, setMes] = useState(String(hoy.getMonth() + 1).padStart(2, "0"));
+  const [anio, setAnio] = useState(ANIO_INICIAL_CON_DATOS);
+  const [mes, setMes] = useState(MES_INICIAL_CON_DATOS);
   const [registroActivo, setRegistroActivo] = useState<EvangelioRegistro | null>(null);
 
   const { inicio, fin } = rangoMesLocal(Number(anio), Number(mes));
@@ -70,13 +73,13 @@ function EvangeliosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("evangelios")
-        .select("*")
+        .select("fecha, santo_tiempo, evangelio, fuente")
         .gte("fecha", inicio)
         .lte("fecha", fin)
         .order("fecha", { ascending: true });
 
       if (error) throw error;
-      return (data ?? []) as EvangelioRegistro[];
+      return (data ?? []).map((row) => mapEvangelioRow(row as Record<string, unknown>)) as EvangelioRegistro[];
     },
   });
 
@@ -167,20 +170,21 @@ function EvangeliosPage() {
               </div>
 
               <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <div className="rounded-lg border border-border bg-secondary/40 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <div className="rounded-lg border border-border bg-secondary/40 p-2.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                     Título
                   </p>
-                  <p className="mt-1 text-sm text-foreground">
+                  <p className="mt-1 text-sm text-foreground leading-snug">
                     {registro.titulo ?? construirTituloEvangelio(registro.fecha)}
                   </p>
                 </div>
-                <div className="rounded-lg border border-border bg-secondary/40 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Descripción base
+                <div className="rounded-lg border border-border bg-secondary/40 p-2.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Fuente
                   </p>
-                  <p className="mt-1 text-sm text-foreground whitespace-pre-line">
-                    {registro.descripcion_base ??
+                  <p className="mt-1 text-sm text-foreground whitespace-pre-line leading-snug">
+                    {registro.fuente ??
+                      registro.descripcion_base ??
                       construirDescripcionBaseEvangelio(
                         registro.fecha,
                         registro.santo_o_tiempo_liturgico,
@@ -242,18 +246,20 @@ function FormularioEditarEvangelio({
   const guardar = async () => {
     setGuardando(true);
 
+      const fuente =
+      limpio(form.fuente) ??
+      limpio(form.descripcion_base) ??
+      construirDescripcionBaseEvangelio(
+        form.fecha,
+        form.santo_o_tiempo_liturgico,
+        form.cita_evangelio,
+      );
+
     const payload = {
       fecha: form.fecha,
-      santo_o_tiempo_liturgico: limpio(form.santo_o_tiempo_liturgico),
-      cita_evangelio: limpio(form.cita_evangelio),
-      titulo: limpio(form.titulo) ?? construirTituloEvangelio(form.fecha),
-      descripcion_base:
-        limpio(form.descripcion_base) ??
-        construirDescripcionBaseEvangelio(
-          form.fecha,
-          form.santo_o_tiempo_liturgico,
-          form.cita_evangelio,
-        ),
+      santo_tiempo: limpio(form.santo_o_tiempo_liturgico),
+      evangelio: limpio(form.cita_evangelio),
+      fuente,
       updated_at: new Date().toISOString(),
     };
 
@@ -312,12 +318,15 @@ function FormularioEditarEvangelio({
       </div>
 
       <div className="grid gap-1.5">
-        <Label htmlFor="evangelio-descripcion">Descripción base</Label>
+        <Label htmlFor="evangelio-fuente">Fuente</Label>
         <Textarea
-          id="evangelio-descripcion"
-          className="min-h-28"
-          value={form.descripcion_base ?? ""}
-          onChange={(e) => set("descripcion_base", e.target.value)}
+          id="evangelio-fuente"
+          className="min-h-20"
+          value={form.fuente ?? form.descripcion_base ?? ""}
+          onChange={(e) => {
+            set("fuente", e.target.value);
+            set("descripcion_base", e.target.value);
+          }}
         />
       </div>
 

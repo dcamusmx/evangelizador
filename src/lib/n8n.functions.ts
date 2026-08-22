@@ -148,7 +148,7 @@ export const generarDesdeEvangelios = createServerFn({ method: "POST" })
 
     const { data: evangelios, error: errorEvangelios } = await context.supabase
       .from("evangelios")
-      .select("fecha, santo_o_tiempo_liturgico, cita_evangelio, titulo, descripcion_base")
+      .select("fecha, santo_tiempo, evangelio, fuente")
       .gte("fecha", inicio)
       .lte("fecha", fin)
       .order("fecha", { ascending: true });
@@ -179,18 +179,16 @@ export const generarDesdeEvangelios = createServerFn({ method: "POST" })
 
     const registrosNuevos = (evangelios ?? [])
       .filter((ev: { fecha: string }) => !yaExistentes.has(ev.fecha))
-      .map((ev: { fecha: string; santo_o_tiempo_liturgico: string | null; cita_evangelio: string | null; titulo: string | null; descripcion_base: string | null }) => ({
+      .map((ev: { fecha: string; santo_tiempo?: string | null; evangelio?: string | null; fuente?: string | null }) => ({
         fecha: ev.fecha,
-        santo_o_tiempo_liturgico: ev.santo_o_tiempo_liturgico ?? null,
-        cita_evangelio: ev.cita_evangelio ?? null,
-        titulo: ev.titulo ?? construirTituloEvangelio(ev.fecha),
-        descripcion_base:
-          ev.descripcion_base ??
-          construirDescripcionBaseEvangelio(
-            ev.fecha,
-            ev.santo_o_tiempo_liturgico,
-            ev.cita_evangelio,
-          ),
+        santo_o_tiempo_liturgico: ev.santo_tiempo ?? null,
+        cita_evangelio: ev.evangelio ?? null,
+        titulo: construirTituloEvangelio(ev.fecha),
+        descripcion_base: construirDescripcionBaseEvangelio(
+          ev.fecha,
+          ev.santo_tiempo,
+          ev.evangelio,
+        ),
         reflexion: null,
         estado: "pendiente_reflexion" as const,
         actualizado_por: context.userId,
