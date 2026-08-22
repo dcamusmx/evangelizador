@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { estadoBloqueadoParaN8n, estadoPermitePublicacion } from "@/types/database";
+import {
+  construirDescripcionBaseEvangelio,
+  construirTituloEvangelio,
+  estadoBloqueadoParaN8n,
+  estadoPermitePublicacion,
+} from "@/types/database";
 
 async function exigirStaff(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("is_staff", { _user_id: context.userId });
@@ -13,6 +18,14 @@ export interface ResultadoGenerarMes {
   via: "n8n" | "local";
   creados: number;
   existentes: number;
+  mensaje: string;
+}
+
+export interface ResultadoCrearDesdeEvangelios {
+  success: true;
+  creados: number;
+  existentes: number;
+  faltantes: string[];
   mensaje: string;
 }
 
@@ -89,6 +102,117 @@ export const generarMes = createServerFn({ method: "POST" })
       mensaje: nuevas.length
         ? `Se crearon ${nuevas.length} días listos para escribir la reflexión.`
         : "El mes ya estaba completo.",
+    };
+  });
+
+function listarFechasRango(inicio: string, fin: string): string[] {
+  const fechas: string[] = [];
+  const inicioDate = new Date(`${inicio}T00:00:00`);
+  const finDate = new Date(`${fin}T00:00:00`);
+  const actual = new Date(inicioDate);
+
+  while (actual <= finDate) {
+    const iso = actual.toISOString().slice(0, 10);
+    fechas.push(iso);
+    actual.setUTCDate(actual.getUTCDate() + 1);
+  }
+
+  return fechas;
+}
+
+export const generarDesdeEvangelios = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { tipo: "mes" | "anio"; anio: number; mes?: number }) => {
+    if (!Number.isInteger(input.anio) || input.anio < 2020 || input.anio > 2100)
+      throw new Error("El año seleccionado no es válido.");
+    if (input.tipo === "mes") {
+      if (!Number.isInteger(input.mes) || input.mes < 1 || input.mes > 12)
+        throw new Error("Selecciona un mes válido.");
+    }
+    return input;
+  })
+  .handler(async ({ data, context }): Promise<ResultadoCrearDesdeEvangelios> => {
+    await exigirStaff(context);
+
+    const mesNumero = data.tipo === "mes" ? data.mes! : 1;
+    const inicio =
+      data.tipo === "mes"
+        ? `${data.anio}-${String(mesNumero).padStart(2, "0")}-01`
+        : `${data.anio}-01-01`;
+    const fin =
+      data.tipo === "mes"
+        ? `${data.anio}-${String(mesNumero).padStart(2, "0")}-${String(
+            new Date(data.anio, mesNumero, 0).getDate(),
+          ).padStart(2, "0")}`
+        : `${data.anio}-12-31`;
+
+    const { data: evangelios, error: errorEvangelios } = await context.supabase
+      .from("evangelios")
+      .select("fecha, santo_o_tiempo_liturgico, cita_evangelio, titulo, descripcion_base")
+      .gte("fecha", inicio)
+      .lte("fecha", fin)
+      .order("fecha", { ascending: true });
+
+    if (errorEvangelios) throw new Error("No pudimos consultar la tabla evangelios.");
+
+    const fechasSeleccionadas = listarFechasRango(inicio, fin);
+    const fechasEnEvangelios = new Set((evangelios ?? []).map((e: { fecha: string }) => e.fecha));
+    const faltantes = fechasSeleccionadas.filter((fecha) => !fechasEnEvangelios.has(fecha));
+
+    if (faltantes.length > 0) {
+      throw new Error(
+        `Faltan fechas en la tabla evangelios para este rango: ${faltantes
+          .slice(0, 10)
+          .join(", ")}${faltantes.length > 10 ? " ..." : ""}. Completa primero esas fechas antes de crear el contenido diario.`,
+      );
+    }
+
+    const { data: registrosActuales, error: errorActuales } = await context.supabase
+      .from("contenido_diario")
+      .select("fecha")
+      .gte("fecha", inicio)
+      .lte("fecha", fin);
+
+    if (errorActuales) throw new Error("No pudimos revisar los registros ya creados.");
+
+    const yaExistentes = new Set((registrosActuales ?? []).map((r: { fecha: string }) => r.fecha));
+
+    const registrosNuevos = (evangelios ?? [])
+      .filter((ev: { fecha: string }) => !yaExistentes.has(ev.fecha))
+      .map((ev: { fecha: string; santo_o_tiempo_liturgico: string | null; cita_evangelio: string | null; titulo: string | null; descripcion_base: string | null }) => ({
+        fecha: ev.fecha,
+        santo_o_tiempo_liturgico: ev.santo_o_tiempo_liturgico ?? null,
+        cita_evangelio: ev.cita_evangelio ?? null,
+        titulo: ev.titulo ?? construirTituloEvangelio(ev.fecha),
+        descripcion_base:
+          ev.descripcion_base ??
+          construirDescripcionBaseEvangelio(
+            ev.fecha,
+            ev.santo_o_tiempo_liturgico,
+            ev.cita_evangelio,
+          ),
+        reflexion: null,
+        estado: "pendiente_reflexion" as const,
+        actualizado_por: context.userId,
+      }));
+
+    if (registrosNuevos.length > 0) {
+      const { error: errorInsert } = await context.supabase
+        .from("contenido_diario")
+        .insert(registrosNuevos as never);
+
+      if (errorInsert) throw new Error("No pudimos crear los registros en contenido_diario.");
+    }
+
+    return {
+      success: true,
+      creados: registrosNuevos.length,
+      existentes: yaExistentes.size,
+      faltantes: [],
+      mensaje:
+        registrosNuevos.length > 0
+          ? `Se crearon ${registrosNuevos.length} registros de contenido diario desde evangelios.`
+          : "No había registros nuevos para crear en este rango.",
     };
   });
 

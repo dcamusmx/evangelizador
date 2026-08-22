@@ -43,6 +43,7 @@ const navItems = [
   { to: "/subir", label: "Subir video", icon: Upload, adminOnly: false },
   { to: "/listado", label: "Listado", icon: CalendarDays, adminOnly: false },
   { to: "/publicaciones", label: "Publicaciones", icon: CalendarDays, adminOnly: false },
+  { to: "/evangelios", label: "Evangelios", icon: CalendarDays, adminOnly: false },
   { to: "/ajustes", label: "Ajustes", icon: Settings, adminOnly: false },
 ] as const;
 

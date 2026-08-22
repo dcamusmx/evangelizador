@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ZerniolinksRouteImport } from './routes/zerniolinks'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEvangeliosRouteImport } from './routes/_authenticated/evangelios'
 import { Route as AuthenticatedListadoRouteImport } from './routes/_authenticated/listado'
 import { Route as AuthenticatedPublicacionesRouteImport } from './routes/_authenticated/publicaciones'
 import { Route as AuthenticatedSubirRouteImport } from './routes/_authenticated/subir'
@@ -45,6 +46,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEvangeliosRoute = AuthenticatedEvangeliosRouteImport.update({
+  id: '/evangelios',
+  path: '/evangelios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedListadoRoute = AuthenticatedListadoRouteImport.update({
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/evangelios': typeof AuthenticatedEvangeliosRoute
   '/listado': typeof AuthenticatedListadoRoute
   '/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/subir': typeof AuthenticatedSubirRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/evangelios': typeof AuthenticatedEvangeliosRoute
   '/listado': typeof AuthenticatedListadoRoute
   '/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/subir': typeof AuthenticatedSubirRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/zerniolinks': typeof ZerniolinksRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/evangelios': typeof AuthenticatedEvangeliosRoute
   '/_authenticated/listado': typeof AuthenticatedListadoRoute
   '/_authenticated/publicaciones': typeof AuthenticatedPublicacionesRoute
   '/_authenticated/subir': typeof AuthenticatedSubirRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/zerniolinks'
     | '/dashboard'
+    | '/evangelios'
     | '/listado'
     | '/publicaciones'
     | '/subir'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/zerniolinks'
     | '/dashboard'
+    | '/evangelios'
     | '/listado'
     | '/publicaciones'
     | '/subir'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/zerniolinks'
     | '/_authenticated/dashboard'
+    | '/_authenticated/evangelios'
     | '/_authenticated/listado'
     | '/_authenticated/publicaciones'
     | '/_authenticated/subir'
@@ -225,6 +237,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/evangelios': {
+      id: '/_authenticated/evangelios'
+      path: '/evangelios'
+      fullPath: '/evangelios'
+      preLoaderRoute: typeof AuthenticatedEvangeliosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/listado': {
@@ -288,6 +307,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEvangeliosRoute: typeof AuthenticatedEvangeliosRoute
   AuthenticatedListadoRoute: typeof AuthenticatedListadoRoute
   AuthenticatedPublicacionesRoute: typeof AuthenticatedPublicacionesRoute
   AuthenticatedSubirRoute: typeof AuthenticatedSubirRoute
@@ -299,6 +319,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEvangeliosRoute: AuthenticatedEvangeliosRoute,
   AuthenticatedListadoRoute: AuthenticatedListadoRoute,
   AuthenticatedPublicacionesRoute: AuthenticatedPublicacionesRoute,
   AuthenticatedSubirRoute: AuthenticatedSubirRoute,

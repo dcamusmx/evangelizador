@@ -88,6 +88,17 @@ export interface ContenidoDiario {
   updated_at: string;
 }
 
+export interface EvangelioRegistro {
+  id?: number | string;
+  fecha: string;
+  santo_o_tiempo_liturgico: string | null;
+  cita_evangelio: string | null;
+  titulo: string | null;
+  descripcion_base: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const ESTADO_LABEL: Record<EstadoContenido, string> = {
   pendiente_reflexion: "Pendiente reflexión",
   pendiente_video: "Pendiente video",
@@ -127,4 +138,28 @@ export function fechaLarga(fecha: string): string {
     month: "long",
     year: "numeric",
   });
+}
+
+export function formatoFechaBarra(fecha: string): string {
+  const [anio, mes, dia] = fecha.split("-");
+  if (!anio || !mes || !dia) return fecha;
+  return `${dia}/${mes}/${anio}`;
+}
+
+export function construirTituloEvangelio(fecha: string): string {
+  return `Evangelio del día - ${formatoFechaBarra(fecha)} - Pbro. Hedilberto Pérez Vicente`;
+}
+
+export function construirDescripcionBaseEvangelio(
+  fecha: string,
+  santo?: string | null,
+  cita?: string | null,
+): string {
+  const lines = [
+    formatoFechaBarra(fecha),
+    santo?.trim() || "",
+    cita ? `Evangelio (${cita})` : "Evangelio",
+  ].filter(Boolean);
+
+  return lines.join("\n");
 }

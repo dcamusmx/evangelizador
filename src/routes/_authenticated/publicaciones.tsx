@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { publicarManual } from "@/lib/n8n.functions";
-import { GenerarMesDialog } from "@/components/GenerarMesDialog";
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -62,9 +61,6 @@ function Publicaciones() {
 
   const { inicio, fin } = rangoMesLocal(Number(anio), Number(mes));
 
-  const [generando, setGenerando] = useState(false);
-
-
   const { data, isLoading } = useQuery({
     queryKey: ["contenido_mes", anio, mes],
     queryFn: async () => {
@@ -96,7 +92,7 @@ function Publicaciones() {
       />
 
       <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]">
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
           <Select value={anio} onValueChange={setAnio}>
             <SelectTrigger>
               <SelectValue placeholder="Año" />
@@ -121,22 +117,10 @@ function Publicaciones() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => setGenerando(true)}>Generar mes</Button>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
           Puedes importar el mes desde Vatican News (flujo externo) o desde un archivo CSV.
         </p>
-
-        <GenerarMesDialog
-          abierto={generando}
-          onOpenChange={setGenerando}
-          anio={Number(anio)}
-          mes={Number(mes)}
-          onListo={() =>
-            void queryClient.invalidateQueries({ queryKey: ["contenido_mes", anio, mes] })
-          }
-        />
-
       </div>
 
       {isLoading ? (
