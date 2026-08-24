@@ -3,10 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { KeyRound, Trash2 } from "lucide-react";
+import { KeyRound, Pencil, Trash2 } from "lucide-react";
 
 import { useAuth } from "@/lib/useAuth";
 import { PageHeader, EmptyState, LoadingSpinner } from "@/components/PageHeader";
+import { EditarCredencialDialog } from "@/components/EditarCredencialDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +25,7 @@ import {
   cambiarEstadoCredencial,
   eliminarCredencial,
   probarCredencialPcloud,
+  type CredencialResumen,
 } from "@/lib/credenciales.functions";
 import { probarCredencialR2 } from "@/lib/r2.functions";
 
@@ -108,6 +110,7 @@ function CredencialesPage() {
   const [nombre, setNombre] = useState("ACCOUNT_ID");
   const [descripcion, setDescripcion] = useState("");
   const [valor, setValor] = useState("");
+  const [credencialEditando, setCredencialEditando] = useState<CredencialResumen | null>(null);
 
   useEffect(() => {
     if (profile && profile.role !== "admin") {
@@ -326,6 +329,14 @@ function CredencialesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Editar credencial"
+                      onClick={() => setCredencialEditando(c)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       aria-label="Eliminar credencial"
                       onClick={() => {
                         if (confirm(`¿Eliminar ${c.servicio} / ${c.nombre}?`)) mBorrar.mutate(c.id);
@@ -340,6 +351,15 @@ function CredencialesPage() {
           </table>
         </div>
       )}
+
+      <EditarCredencialDialog
+        credencial={credencialEditando}
+        abierto={credencialEditando !== null}
+        onOpenChange={(v) => {
+          if (!v) setCredencialEditando(null);
+        }}
+        onGuardado={() => void qc.invalidateQueries({ queryKey: ["credenciales"] })}
+      />
     </div>
   );
 }
