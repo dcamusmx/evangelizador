@@ -50,7 +50,7 @@ function AjustesHome() {
         data: {
           tipo,
           anio: Number(anio),
-          mes: tipo === "mes" ? Number(mes) : undefined,
+          ...(tipo === "mes" ? { mes: Number(mes) } : {}),
         },
       }),
     onSuccess: (r) => {

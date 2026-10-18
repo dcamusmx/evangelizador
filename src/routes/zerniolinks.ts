@@ -74,7 +74,7 @@ async function reenviar(request: Request): Promise<Response> {
     const respuesta = await fetch(destino, {
       method: request.method,
       headers,
-      body: cuerpoRaw.length > 0 ? cuerpoRaw : undefined,
+      ...(cuerpoRaw.length > 0 ? { body: cuerpoRaw } : {}),
       signal: controller.signal,
     });
 

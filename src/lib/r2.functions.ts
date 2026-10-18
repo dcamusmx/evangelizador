@@ -77,14 +77,15 @@ export const confirmarSubidaR2 = createServerFn({ method: "POST" })
     const meta = await cabecerasObjeto(cfg, data.objectKey);
     if (!meta) throw new Error("El video se subió pero no pudo verificarse.");
 
-    const { data: fila } = await context.supabase
+    const { data: fila, error: errorLectura } = await context.supabase
       .from("contenido_diario")
-      .select("reflexion")
+      .select("reflexion, estado")
       .eq("fecha", data.fecha)
       .maybeSingle();
+    if (errorLectura) throw new Error("No pudimos leer el estado del registro del día.");
 
     const estado = derivarEstadoContenido({
-      reflexion: fila?.reflexion,
+      reflexion: fila?.reflexion ?? null,
       storage_key: data.objectKey,
       fileid_pcloud: null,
       estadoActual: fila?.estado ?? null,

@@ -79,7 +79,7 @@ function EvangeliosPage() {
         .order("fecha", { ascending: true });
 
       if (error) throw error;
-      return (data ?? []).map((row) => mapEvangelioRow(row as Record<string, unknown>)) as EvangelioRegistro[];
+      return (data ?? []).map((row) => mapEvangelioRow(row));
     },
   });
 

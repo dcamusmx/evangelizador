@@ -73,6 +73,9 @@ export interface ContenidoDiario {
   link_publico_pcloud: string | null;
   link_facebook: string | null;
   link_youtube: string | null;
+  // Zernio post._id (not native network IDs): nullable text, no default.
+  youtubepostid: string | null;
+  facebookpostid: string | null;
   estado: EstadoContenido;
   storage_provider: string | null;
   storage_key: string | null;
@@ -96,8 +99,8 @@ export interface EvangelioRegistro {
   titulo: string | null;
   fuente: string | null;
   descripcion_base?: string | null;
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export function mapEvangelioRow(
@@ -110,15 +113,15 @@ export function mapEvangelioRow(
   const fuente = row.fuente ?? row.descripcion_base ?? null;
 
   return {
-    id: row.id,
+    ...(row.id !== undefined ? { id: row.id } : {}),
     fecha: row.fecha ?? "",
     santo_o_tiempo_liturgico: row.santo_o_tiempo_liturgico ?? row.santo_tiempo ?? null,
     cita_evangelio: row.cita_evangelio ?? row.evangelio ?? null,
     titulo: row.titulo ?? null,
     fuente,
     descripcion_base: fuente,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
+    ...(row.created_at !== undefined ? { created_at: row.created_at } : {}),
+    ...(row.updated_at !== undefined ? { updated_at: row.updated_at } : {}),
   };
 }
 

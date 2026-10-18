@@ -126,7 +126,12 @@ export const generarDesdeEvangelios = createServerFn({ method: "POST" })
     if (!Number.isInteger(input.anio) || input.anio < 2020 || input.anio > 2100)
       throw new Error("El año seleccionado no es válido.");
     if (input.tipo === "mes") {
-      if (!Number.isInteger(input.mes) || input.mes < 1 || input.mes > 12)
+      if (
+        typeof input.mes !== "number" ||
+        !Number.isInteger(input.mes) ||
+        input.mes < 1 ||
+        input.mes > 12
+      )
         throw new Error("Selecciona un mes válido.");
     }
     return input;

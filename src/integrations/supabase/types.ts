@@ -1,3 +1,5 @@
+// Manual compatibility update for grjxcsngfnxdkkdkkujh; not regenerated.
+// See docs/contrato-supabase-manual.md for verified metadata and remaining limits.
 export type Json =
   | string
   | number
@@ -22,6 +24,7 @@ export type Database = {
           descripcion_base: string | null
           estado: Database["public"]["Enums"]["estado_contenido"]
           fecha: string
+          facebookpostid: string | null;
           fileid_pcloud: number | null
           link_facebook: string | null
           link_publico_pcloud: string | null
@@ -39,6 +42,7 @@ export type Database = {
           subido_por: string | null
           titulo: string | null
           updated_at: string
+          youtubepostid: string | null;
         }
         Insert: {
           actualizado_por?: string | null
@@ -47,6 +51,7 @@ export type Database = {
           descripcion_base?: string | null
           estado?: Database["public"]["Enums"]["estado_contenido"]
           fecha: string
+          facebookpostid?: string | null;
           fileid_pcloud?: number | null
           link_facebook?: string | null
           link_publico_pcloud?: string | null
@@ -64,6 +69,7 @@ export type Database = {
           subido_por?: string | null
           titulo?: string | null
           updated_at?: string
+          youtubepostid?: string | null;
         }
         Update: {
           actualizado_por?: string | null
@@ -72,6 +78,7 @@ export type Database = {
           descripcion_base?: string | null
           estado?: Database["public"]["Enums"]["estado_contenido"]
           fecha?: string
+          facebookpostid?: string | null;
           fileid_pcloud?: number | null
           link_facebook?: string | null
           link_publico_pcloud?: string | null
@@ -89,6 +96,7 @@ export type Database = {
           subido_por?: string | null
           titulo?: string | null
           updated_at?: string
+          youtubepostid?: string | null;
         }
         Relationships: []
       }
@@ -131,6 +139,33 @@ export type Database = {
         }
         Relationships: []
       }
+      evangelios: {
+        Row: {
+          fecha: string;
+          santo_tiempo: string | null;
+          evangelio: string | null;
+          fuente: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          fecha: string;
+          santo_tiempo?: string | null;
+          evangelio?: string | null;
+          fuente?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          fecha?: string;
+          santo_tiempo?: string | null;
+          evangelio?: string | null;
+          fuente?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           created_at: string

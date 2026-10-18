@@ -63,14 +63,15 @@ export const confirmarSubida = createServerFn({ method: "POST" })
 
     const link = await obtenerLinkPublico(cfg, archivo.fileid);
 
-    const { data: fila } = await context.supabase
+    const { data: fila, error: errorLectura } = await context.supabase
       .from("contenido_diario")
-      .select("reflexion")
+      .select("reflexion, estado")
       .eq("fecha", data.fecha)
       .maybeSingle();
+    if (errorLectura) throw new Error("No pudimos leer el estado del registro del día.");
 
     const estado = derivarEstadoContenido({
-      reflexion: fila?.reflexion,
+      reflexion: fila?.reflexion ?? null,
       storage_key: null,
       fileid_pcloud: archivo.fileid,
       estadoActual: fila?.estado ?? null,

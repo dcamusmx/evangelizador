@@ -42,7 +42,13 @@ function DashboardOperativo() {
 
       if (errorRegistros) throw errorRegistros;
 
-      const ids = [...new Set((registros ?? []).map((r) => r.actualizado_por).filter(Boolean))];
+      const ids = [
+        ...new Set(
+          (registros ?? [])
+            .map((r) => r.actualizado_por)
+            .filter((id): id is string => typeof id === "string" && id.length > 0),
+        ),
+      ];
       const perfilesMap = new Map<string, string>();
 
       if (ids.length > 0) {
