@@ -28,7 +28,7 @@ Proyecto confirmado: `grjxcsngfnxdkkdkkujh`.
 | DELETE | Sin políticas DELETE en ambas | Consumidores privilegiados externos |
 | `profiles` | Lectura propia; lectura general y UPDATE para admin | DDL, relaciones y alta automática desde Auth |
 | `is_staff`, `has_role` | STABLE, SECURITY DEFINER, search_path=public, consulta explícita a `public.profiles`; anon sin EXECUTE, authenticated/service_role con EXECUTE | Captura literal de firmas, cuerpos, propietarios y ACL |
-| Grants de ambas | anon/authenticated: SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER | ACL, herencia y privilegios predeterminados completos |
+| Grants de ambas | ACL anterior capturada: cuatro roles con ocho permisos, incluido MAINTAIN, grantor postgres y sin grant option; sin PUBLIC ni grants de columna. Reducción posterior declarada aplicada/verificada manualmente: anon sin los ocho, authenticated solo SELECT/INSERT/UPDATE; postgres/service_role conservados | Privilegios predeterminados y usuario exclusivo de n8n; conservar futuras capturas ACL |
 | Historial | `to_regclass('supabase_migrations.schema_migrations')` devuelve NULL | Procedencia de cambios; no hay historial acreditado en esa ubicación |
 
 Enums confirmados: `app_role` = admin/editor/pendiente; `estado_contenido` = pendiente_reflexion/pendiente_video/listo_para_publicar/programado/publicado/error.
@@ -45,7 +45,7 @@ Nota posterior: la tabla siguiente conserva la comparación inicial. El contrato
 | Tipos generados | `src/integrations/supabase/types.ts` omite `evangelios` | Contrato tipado incompleto |
 | IDs de publicaciones | Inicialmente ausentes en migraciones y tipos; incorporados después manualmente en tipos Supabase y `ContenidoDiario` | `youtubepostid` y `facebookpostid`: text, nullable, sin default. Guardan `post._id` de Zernio según confirmación del propietario basada en el workflow exportado; no IDs nativos de las redes. Migraciones sin modificar |
 | Políticas Evangelios | Migración: authenticated mediante `is_staff` | Activa: PUBLIC con comprobación de perfil; comparar semántica antes de normalizar |
-| Grants | Migraciones: SELECT/INSERT/UPDATE a authenticated y ALL a service_role | Activa: permisos más amplios a anon/authenticated; reducción pendiente de validar |
+| Grants | Migraciones históricas sin reconciliar; scripts controlados en supabase/proposals/minimum-table-privileges | Reducción aplicada y verificada manualmente por el propietario: acceso, edición, subida y publicación funcionan. Pendientes default privileges y usuario exclusivo n8n |
 | Historial | Seis archivos versionados | No se acredita su ejecución en la base |
 
 Migraciones históricas, **sin declarar ninguna aplicada**:
