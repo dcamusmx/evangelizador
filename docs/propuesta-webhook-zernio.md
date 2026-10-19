@@ -46,7 +46,7 @@ Resultados de la revisión final:
 - Sin referencias funcionales en src/tests a zerniolinks, las dos variables retiradas, DESTINO_DEFAULT o la antigua IP. Las referencias documentales son históricas o describen esta retirada.
 - Comparación contra HEAD: helpers n8n/credenciales, funciones de publicación y panel intactos. En .env.example se preservan las demás asignaciones, comprobadas sin imprimir sus valores.
 
-Limitación adicional detectada: .env.example contiene un valor preexistente con apariencia de credencial ajeno a las dos variables retiradas. No se verifica su vigencia ni se modifica en este lote; revisar por separado su procedencia y eventual rotación. No copiarlo a documentación. Los valores de .env permanecieron sin leer ni modificar.
+Hallazgo posterior resuelto en un lote separado: se sustituyeron por placeholders los valores del ejemplo, incluidos tres secretos de servidor potencialmente expuestos. Vigencia y rotación siguen pendientes; ver [la clasificación y recuperación](credenciales-en-ejemplo.md). El lote de retirada no los modificó. Los valores de .env permanecieron sin leer ni modificar.
 
 Tras un despliegue futuro autorizado, comprobar que la ruta retirada no reenvía solicitudes ni redirige al flujo activo. No publicar contenido ni eliminar videos para validar.
 
