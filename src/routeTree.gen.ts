@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as ZerniolinksRouteImport } from './routes/zerniolinks'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEvangeliosRouteImport } from './routes/_authenticated/evangelios'
@@ -31,11 +30,6 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ZerniolinksRoute = ZerniolinksRouteImport.update({
-  id: '/zerniolinks',
-  path: '/zerniolinks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
@@ -101,7 +95,6 @@ const ApiPublicR2DownloadUrlRoute = ApiPublicR2DownloadUrlRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
-  '/zerniolinks': typeof ZerniolinksRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/evangelios': typeof AuthenticatedEvangeliosRoute
   '/listado': typeof AuthenticatedListadoRoute
@@ -115,7 +108,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/zerniolinks': typeof ZerniolinksRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/evangelios': typeof AuthenticatedEvangeliosRoute
   '/listado': typeof AuthenticatedListadoRoute
@@ -132,7 +124,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/zerniolinks': typeof ZerniolinksRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/evangelios': typeof AuthenticatedEvangeliosRoute
   '/_authenticated/listado': typeof AuthenticatedListadoRoute
@@ -150,7 +141,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
-    | '/zerniolinks'
     | '/dashboard'
     | '/evangelios'
     | '/listado'
@@ -164,7 +154,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
-    | '/zerniolinks'
     | '/dashboard'
     | '/evangelios'
     | '/listado'
@@ -180,7 +169,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
-    | '/zerniolinks'
     | '/_authenticated/dashboard'
     | '/_authenticated/evangelios'
     | '/_authenticated/listado'
@@ -197,7 +185,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
-  ZerniolinksRoute: typeof ZerniolinksRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   ApiPublicR2DownloadUrlRoute: typeof ApiPublicR2DownloadUrlRoute
 }
@@ -216,13 +203,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/zerniolinks': {
-      id: '/zerniolinks'
-      path: '/zerniolinks'
-      fullPath: '/zerniolinks'
-      preLoaderRoute: typeof ZerniolinksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
@@ -335,7 +315,6 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
-  ZerniolinksRoute: ZerniolinksRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   ApiPublicR2DownloadUrlRoute: ApiPublicR2DownloadUrlRoute,
 }

@@ -106,4 +106,8 @@ Validaciones del estado final, realizadas en carpetas temporales nuevas sin copi
 
 Avisos restantes no relacionados con npm audit: instalación informa deprecación de tsconfck y falta de mantenimiento de Recharts 2; build informa de inputValidator obsoleto y resolución nativa de paths disponible en Vite. No se corrigen en este lote. La deuda de lint previa permanece fuera de alcance y no se reejecutó lint al no cambiar código funcional. No se probó apertura interactiva del editor ni integraciones externas.
 
-Recuperación: revertir el commit de este lote en un commit nuevo y reinstalar desde ambos lockfiles anteriores; ello reintroduciría las alertas conocidas y requiere evaluar ese riesgo. No hubo cambios de datos ni servicios. Sin push ni despliegue; producción continúa teniendo como último estado confirmado 58fae14.
+Recuperación: revertir el commit de este lote en un commit nuevo y reinstalar desde ambos lockfiles anteriores; ello reintroduciría las alertas conocidas y requiere evaluar ese riesgo. No hubo cambios de datos ni servicios. Al cerrar la implementación local todavía no se había realizado push ni despliegue.
+
+## Publicación y comprobación manual posterior
+
+El commit `3f5d8167e1db201572c41f76823a0d71ef69346f` se publicó mediante push fast-forward autorizado a origin/main. Posteriormente, el propietario confirmó producción: **Vercel Ready; acceso, navegación y edición de registros correctos**. Evidencia manual comunicada en esta conversación, sin inspección directa del panel por el agente. No acredita pruebas de recepción de webhooks, publicación de contenido ni eliminación de videos. No se aportaron deployment ID ni fecha del despliegue.
