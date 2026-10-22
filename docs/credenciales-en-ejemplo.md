@@ -1,5 +1,7 @@
 # Saneamiento de .env.example
 
+El procedimiento operativo posterior está en [rotación de secretos](procedimiento-rotacion-secretos.md): inventario, corte coordinado, revocación Supabase, recifrado y revisión histórica. El [cierre del recifrado](ejecucion-final-recifrado.md) registra 8 filas y COMMIT confirmado por la herramienta; el propietario confirma variable Production actualizada, redespliegue Ready y prueba R2 correcta. No se da por completada la rotación independiente de N8N_INTERNAL_API_KEY ni de las credenciales subyacentes.
+
 ## Clasificación comprobada en código
 
 La revisión local encontró valores no vacíos y sin forma de placeholder en el ejemplo. No se consultaron servicios ni valores de .env, y no se verificó vigencia de las credenciales.
@@ -21,7 +23,7 @@ Los tres valores con función de secreto aparecen tanto en HEAD previo como en e
 Requieren revisión y rotación/revocación si todavía están vigentes:
 
 1. **N8N_INTERNAL_API_KEY**: coordinar Vercel y los consumidores/verificadores correspondientes en n8n, incluido el acceso al endpoint de descarga R2. No confundirla con n8n / API_KEY del panel sin comprobar correspondencia. Conservar compatibilidad durante el cambio y comprobar el flujo activo con una operación posterior autorizada.
-2. **SUPABASE_SERVICE_ROLE_KEY**: identificar y revocar la credencial expuesta mediante el mecanismo admitido por el proyecto correcto, grjxcsngfnxdkkdkkujh, y actualizar los consumidores administrativos. El formato observado es JWT heredado: cambiar solo la variable no invalida la copia antigua. Antes de rotar material de firma compartido, evaluar efectos en otras claves y sesiones; este documento no autoriza ninguna operación.
+2. **SUPABASE_SERVICE_ROLE_KEY**: actualizar los consumidores administrativos y preparar la invalidación de la JWT en el proyecto grjxcsngfnxdkkdkkujh. Según advertencia del panel confirmada por el usuario, desactivar las claves heredadas bloquea apikey pero NO su uso como JWT. Cambiar la variable tampoco la invalida. Revisar JWT Signing Keys y la retirada de confianza en la firma heredada, con efectos sobre sesiones y consumidores; véase el procedimiento enlazado. No se autoriza aquí rotación ni revocación de firma.
 3. **CREDENCIALES_ENC_KEY**: preparar descifrado con la llave anterior y recifrado controlado con una nueva, con respaldo y recuperación comprobados. No sustituir simplemente la variable: dejaría ilegibles las credenciales existentes. Evaluar también las credenciales protegidas si terceros pudieron obtener tanto la llave expuesta como sus valores cifrados; no se ha comprobado tal acceso.
 
 No se recomienda rotar claves publicables solo por estar visibles: fueron diseñadas para exposición al cliente. Su sustitución en el ejemplo mejora la portabilidad. Esta revisión no verifica RLS ni concede seguridad al resto del sistema.
