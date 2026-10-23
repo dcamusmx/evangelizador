@@ -1,0 +1,16 @@
+{
+  "sourceNodeCount": 30,
+  "preparedNodeCount": 31,
+  "sourceActive": true,
+  "preparedActive": false,
+  "sourceSchedulePresent": true,
+  "sourceScheduleEnabled": true,
+  "sharedCredential": "Header Auth account 2",
+  "directWebhookReferences": [],
+  "headerReads": [],
+  "sourceExplicitExecutionSavingSettings": [],
+  "sourceDeletionNodePresent": true,
+  "reviewOnly": true,
+  "installed": false,
+  "keyRotated": false
+}

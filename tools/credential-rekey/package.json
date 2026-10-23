@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test rekey.test.mjs preflight.test.mjs",
-    "test:native": "node --test --test-concurrency=1 native.test.mjs"
+    "test:native": "node --test --test-concurrency=1 native.test.mjs",
+    "test:privileges": "node --test --test-concurrency=1 privileges.test.mjs"
   },
   "dependencies": { "pg": "8.16.3" },
   "devDependencies": { "@electric-sql/pglite": "0.3.14" }
