@@ -1,0 +1,1998 @@
+{
+  "name": "Publication restored - sanitized review only",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "review-final-node-1",
+      "name": "If - Sin video en R2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_TELEGRAM_CHAT_ID",
+        "text": "=⚠️ No hay video subido en R2 para hoy ({{ $now.toFormat('yyyy-MM-dd') }}). No se puede publicar.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "review-final-node-2",
+      "name": "Telegram - Avisar sin video",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_telegramApi_CREDENTIAL_ID",
+          "name": "REPLACE_telegramApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.reflexion }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "review-final-node-3",
+      "name": "If - Sin reflexión",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_TELEGRAM_CHAT_ID",
+        "text": "=⚠️ Falta la reflexión de hoy ({{ $now.toFormat('yyyy-MM-dd') }}). No se puede publicar.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "review-final-node-4",
+      "name": "Telegram - Avisar sin reflexión",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1056,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_telegramApi_CREDENTIAL_ID",
+          "name": "REPLACE_telegramApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1",
+              "name": "descripcion_final",
+              "type": "string",
+              "value": "={{ $json.descripcion_base }}\n\nReflexión:\n{{ $json.reflexion }}"
+            },
+            {
+              "id": "b2",
+              "name": "video_url",
+              "type": "string",
+              "value": "={{ $json.downloadUrl }}"
+            },
+            {
+              "id": "b3",
+              "name": "titulo",
+              "type": "string",
+              "value": "={{ $json.titulo }}"
+            },
+            {
+              "id": "b4",
+              "name": "fecha",
+              "type": "string",
+              "value": "={{ $json.fecha }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "review-final-node-5",
+      "name": "Armar descripción final",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "posts",
+        "operation": "create",
+        "content": "={{ $('Armar descripción final').item.json.descripcion_final }}",
+        "publishNow": true,
+        "tags": "Católico, Evangelio, Biblia, Palabra de Dios, Reflexión, Cristo, Cristo Glorioso de Chiapas, Presbítero, Santo, Iglesia, Religión, Cristiano, Catolicísimo, Catecismo, Catequesis",
+        "selectedPlatforms": [
+          "youtube"
+        ],
+        "youtubeAccounts": [
+          "REPLACE_SOCIAL_ACCOUNT_ID"
+        ],
+        "mediaItems": {
+          "items": [
+            {
+              "type": "video",
+              "url": "={{ $('Armar descripción final').item.json.video_url }}"
+            }
+          ]
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-late.late",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        448
+      ],
+      "id": "review-final-node-6",
+      "name": "Subir Youtube",
+      "credentials": {
+        "lateApi": {
+          "id": "REPLACE_lateApi_CREDENTIAL_ID",
+          "name": "REPLACE_lateApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "posts",
+        "operation": "create",
+        "content": "={{ $json.descripcion_final }}",
+        "publishNow": true,
+        "tags": "Católico, Evangelio, Biblia, Palabra de Dios, Reflexión, Cristo, Cristo Glorioso de Chiapas, Presbítero, Santo, Iglesia, Religión, Cristiano, Catolicísimo, Catecismo, Catequesis",
+        "selectedPlatforms": [
+          "facebook"
+        ],
+        "facebookAccounts": [
+          "REPLACE_SOCIAL_ACCOUNT_ID"
+        ],
+        "mediaItems": {
+          "items": [
+            {
+              "type": "video",
+              "url": "={{ $json.video_url }}"
+            }
+          ]
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-late.late",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        192
+      ],
+      "id": "review-final-node-7",
+      "name": "Subir Facebook",
+      "credentials": {
+        "lateApi": {
+          "id": "REPLACE_lateApi_CREDENTIAL_ID",
+          "name": "REPLACE_lateApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "REPLACE_PUBLICATION_WEBHOOK_PATH",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        480
+      ],
+      "id": "review-final-node-8",
+      "name": "Webhook",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_httpHeaderAuth_CREDENTIAL_ID",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ac293f29-fa8d-4318-801e-01556cedf1b0",
+              "name": "=fecha",
+              "value": "={{ $json.body?.fecha ?? $now.toFormat('yyyy-MM-dd') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        288
+      ],
+      "id": "review-final-node-9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM contenido_diario\nWHERE fecha = $1\n  AND estado NOT IN ('publicado', 'programado');",
+        "options": {
+          "queryReplacement": "={{ [$json.fecha] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        256,
+        288
+      ],
+      "id": "review-final-node-10",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_postgres_CREDENTIAL_ID",
+          "name": "REPLACE_postgres_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://evangelizador.vercel.app/api/public/r2-download-url",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fecha",
+              "value": "={{ $json.fecha_r2 }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        560,
+        288
+      ],
+      "id": "review-final-node-11",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_httpHeaderAuth_CREDENTIAL_ID",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fechaOriginal = item.json.fecha;\n\n  item.json.fecha_r2 =\n    typeof fechaOriginal === 'string'\n      ? fechaOriginal.slice(0, 10)\n      : null;\n\n  return item;\n});;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        288
+      ],
+      "id": "review-final-node-12",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -80
+      ],
+      "id": "review-final-node-13",
+      "name": "Manual"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": []
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        48
+      ],
+      "id": "review-final-node-14",
+      "name": "Programado",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM contenido_diario\nWHERE fecha = $1\n  AND estado NOT IN ('publicado', 'programado');",
+        "options": {
+          "queryReplacement": "=2026-08-01"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        384,
+        -80
+      ],
+      "id": "review-final-node-15",
+      "name": "Fecha manual",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_postgres_CREDENTIAL_ID",
+          "name": "REPLACE_postgres_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_TELEGRAM_CHAT_ID",
+        "text": "=Video enviado a Zernio, esperando publicacion en Youtube",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        448
+      ],
+      "id": "review-final-node-16",
+      "name": "Aviso de posteo Zernio - Youtube",
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_telegramApi_CREDENTIAL_ID",
+          "name": "REPLACE_telegramApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "posts",
+        "operation": "get",
+        "postId": "={{ $('Subir Youtube').item.json.post._id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-late.late",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        448
+      ],
+      "id": "review-final-node-17",
+      "name": "Obtener datos Youtube",
+      "credentials": {
+        "lateApi": {
+          "id": "REPLACE_lateApi_CREDENTIAL_ID",
+          "name": "REPLACE_lateApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_TELEGRAM_CHAT_ID",
+        "text": "=Video enviado a Zernio, esperando publicacion en Facebook\n",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        192
+      ],
+      "id": "review-final-node-18",
+      "name": "Aviso de posteo Zernio - Facebook",
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_telegramApi_CREDENTIAL_ID",
+          "name": "REPLACE_telegramApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1712,
+        448
+      ],
+      "id": "review-final-node-19",
+      "name": "Espera Youtube"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "contenido_diario",
+          "mode": "list",
+          "cachedResultName": "contenido_diario"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $('Armar descripción final').item.json.fecha }}",
+            "youtubepostid": "={{ $json.post._id }}",
+            "link_youtube": "={{ $json.post.platforms[0].platformPostUrl }}"
+          },
+          "matchingColumns": [
+            "fecha"
+          ],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "santo_o_tiempo_liturgico",
+              "displayName": "santo_o_tiempo_liturgico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cita_evangelio",
+              "displayName": "cita_evangelio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "descripcion_base",
+              "displayName": "descripcion_base",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "reflexion",
+              "displayName": "reflexion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nombre_archivo_pcloud",
+              "displayName": "nombre_archivo_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fileid_pcloud",
+              "displayName": "fileid_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_publico_pcloud",
+              "displayName": "link_publico_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_youtube",
+              "displayName": "link_youtube",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "options",
+              "canBeUsedToMatch": true,
+              "options": [
+                {
+                  "name": "pendiente_reflexion",
+                  "value": "pendiente_reflexion"
+                },
+                {
+                  "name": "pendiente_video",
+                  "value": "pendiente_video"
+                },
+                {
+                  "name": "listo_para_publicar",
+                  "value": "listo_para_publicar"
+                },
+                {
+                  "name": "programado",
+                  "value": "programado"
+                },
+                {
+                  "name": "publicado",
+                  "value": "publicado"
+                },
+                {
+                  "name": "error",
+                  "value": "error"
+                }
+              ],
+              "removed": true
+            },
+            {
+              "id": "subido_por",
+              "displayName": "subido_por",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "actualizado_por",
+              "displayName": "actualizado_por",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_provider",
+              "displayName": "storage_provider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_key",
+              "displayName": "storage_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_filename",
+              "displayName": "storage_filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_size",
+              "displayName": "storage_size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_content_type",
+              "displayName": "storage_content_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_etag",
+              "displayName": "storage_etag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_uploaded_at",
+              "displayName": "storage_uploaded_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_facebook",
+              "displayName": "link_facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "youtubepostid",
+              "displayName": "youtubepostid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "facebookpostid",
+              "displayName": "facebookpostid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2048,
+        448
+      ],
+      "id": "review-final-node-20",
+      "name": "Actualiza datos de Youtube",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_postgres_CREDENTIAL_ID",
+          "name": "REPLACE_postgres_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "posts",
+        "operation": "get",
+        "postId": "={{ $('Subir Facebook').item.json.post._id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-late.late",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        192
+      ],
+      "id": "review-final-node-21",
+      "name": "Obtener datos Facebook",
+      "credentials": {
+        "lateApi": {
+          "id": "REPLACE_lateApi_CREDENTIAL_ID",
+          "name": "REPLACE_lateApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "contenido_diario",
+          "mode": "list",
+          "cachedResultName": "contenido_diario"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $('Armar descripción final').item.json.fecha }}",
+            "link_facebook": "={{ $json.post.platforms[0].platformPostUrl }}",
+            "facebookpostid": "={{ $json.post._id }}"
+          },
+          "matchingColumns": [
+            "fecha"
+          ],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "santo_o_tiempo_liturgico",
+              "displayName": "santo_o_tiempo_liturgico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cita_evangelio",
+              "displayName": "cita_evangelio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "descripcion_base",
+              "displayName": "descripcion_base",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "reflexion",
+              "displayName": "reflexion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nombre_archivo_pcloud",
+              "displayName": "nombre_archivo_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fileid_pcloud",
+              "displayName": "fileid_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_publico_pcloud",
+              "displayName": "link_publico_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_youtube",
+              "displayName": "link_youtube",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "options",
+              "canBeUsedToMatch": true,
+              "options": [
+                {
+                  "name": "pendiente_reflexion",
+                  "value": "pendiente_reflexion"
+                },
+                {
+                  "name": "pendiente_video",
+                  "value": "pendiente_video"
+                },
+                {
+                  "name": "listo_para_publicar",
+                  "value": "listo_para_publicar"
+                },
+                {
+                  "name": "programado",
+                  "value": "programado"
+                },
+                {
+                  "name": "publicado",
+                  "value": "publicado"
+                },
+                {
+                  "name": "error",
+                  "value": "error"
+                }
+              ],
+              "removed": true
+            },
+            {
+              "id": "subido_por",
+              "displayName": "subido_por",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "actualizado_por",
+              "displayName": "actualizado_por",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_provider",
+              "displayName": "storage_provider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_key",
+              "displayName": "storage_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_filename",
+              "displayName": "storage_filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_size",
+              "displayName": "storage_size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_content_type",
+              "displayName": "storage_content_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_etag",
+              "displayName": "storage_etag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_uploaded_at",
+              "displayName": "storage_uploaded_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_facebook",
+              "displayName": "link_facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "youtubepostid",
+              "displayName": "youtubepostid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "facebookpostid",
+              "displayName": "facebookpostid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1920,
+        192
+      ],
+      "id": "review-final-node-22",
+      "name": "Actualiza datos de facebook",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_postgres_CREDENTIAL_ID",
+          "name": "REPLACE_postgres_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.titulo }}\n{{ $json.descripcion_base }}\n{{ $json.reflexion }}\n{{ $json.link_facebook }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2096,
+        192
+      ],
+      "id": "review-final-node-23",
+      "name": "Aviso post publicado Facebook",
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_telegramApi_CREDENTIAL_ID",
+          "name": "REPLACE_telegramApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.titulo }}\n{{ $json.descripcion_base }}\n{{ $json.reflexion }}\n{{ $('Obtener datos Youtube').item.json.post.platforms[0].platformPostUrl }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2208,
+        448
+      ],
+      "id": "review-final-node-24",
+      "name": "Aviso post publicado Youtube",
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_telegramApi_CREDENTIAL_ID",
+          "name": "REPLACE_telegramApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "REPLACE_R2_BUCKET_NAME",
+        "fileKey": "={{ $('HTTP Request').item.json.object.key }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        336
+      ],
+      "id": "review-final-node-25",
+      "name": "Delete a file",
+      "credentials": {
+        "s3": {
+          "id": "REPLACE_s3_CREDENTIAL_ID",
+          "name": "REPLACE_s3_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2320,
+        336
+      ],
+      "id": "review-final-node-26",
+      "name": "Wait"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "contenido_diario",
+          "mode": "list",
+          "cachedResultName": "contenido_diario"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $('Armar descripción final').item.json.fecha }}",
+            "storage_key": "Depurado",
+            "estado": "publicado"
+          },
+          "matchingColumns": [
+            "fecha"
+          ],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "santo_o_tiempo_liturgico",
+              "displayName": "santo_o_tiempo_liturgico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cita_evangelio",
+              "displayName": "cita_evangelio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "titulo",
+              "displayName": "titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "descripcion_base",
+              "displayName": "descripcion_base",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "reflexion",
+              "displayName": "reflexion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nombre_archivo_pcloud",
+              "displayName": "nombre_archivo_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fileid_pcloud",
+              "displayName": "fileid_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_publico_pcloud",
+              "displayName": "link_publico_pcloud",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_youtube",
+              "displayName": "link_youtube",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "options",
+              "canBeUsedToMatch": true,
+              "options": [
+                {
+                  "name": "pendiente_reflexion",
+                  "value": "pendiente_reflexion"
+                },
+                {
+                  "name": "pendiente_video",
+                  "value": "pendiente_video"
+                },
+                {
+                  "name": "listo_para_publicar",
+                  "value": "listo_para_publicar"
+                },
+                {
+                  "name": "programado",
+                  "value": "programado"
+                },
+                {
+                  "name": "publicado",
+                  "value": "publicado"
+                },
+                {
+                  "name": "error",
+                  "value": "error"
+                }
+              ],
+              "removed": false
+            },
+            {
+              "id": "subido_por",
+              "displayName": "subido_por",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "actualizado_por",
+              "displayName": "actualizado_por",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_provider",
+              "displayName": "storage_provider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_key",
+              "displayName": "storage_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "storage_filename",
+              "displayName": "storage_filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_size",
+              "displayName": "storage_size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_content_type",
+              "displayName": "storage_content_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_etag",
+              "displayName": "storage_etag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "storage_uploaded_at",
+              "displayName": "storage_uploaded_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "link_facebook",
+              "displayName": "link_facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "youtubepostid",
+              "displayName": "youtubepostid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "facebookpostid",
+              "displayName": "facebookpostid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2624,
+        336
+      ],
+      "id": "review-final-node-27",
+      "name": "Actualiza store key eliminado",
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_postgres_CREDENTIAL_ID",
+          "name": "REPLACE_postgres_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_TELEGRAM_CHAT_ID",
+        "text": "=Video depurado de Cloudfare R2: {{ $('Code in JavaScript').item.json.fecha_r2 }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2784,
+        336
+      ],
+      "id": "review-final-node-28",
+      "name": "Send a text message",
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_telegramApi_CREDENTIAL_ID",
+          "name": "REPLACE_telegramApi_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0ea34208-20cb-48dc-9798-d9ba1627f89a",
+              "leftValue": "={{ $('Execute a SQL query').item.json.link_youtube }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1232,
+        448
+      ],
+      "id": "review-final-node-29",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aff66536-db5d-4ac1-810b-abb3c669354a",
+              "leftValue": "={{ $('Execute a SQL query').item.json.link_facebook }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1168,
+        176
+      ],
+      "id": "review-final-node-30",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "87d534a9-d1e8-49f8-b4a5-11b15d199f16",
+              "name": "body.fecha",
+              "value": "={{ $json.body.fecha }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        480
+      ],
+      "id": "review-final-node-31",
+      "name": "Filtrar entrada autorizada"
+    }
+  ],
+  "connections": {
+    "If - Sin video en R2": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Avisar sin video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If - Sin reflexión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If - Sin reflexión": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Avisar sin reflexión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Armar descripción final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar descripción final": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir Youtube": {
+      "main": [
+        [
+          {
+            "node": "Aviso de posteo Zernio - Youtube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir Facebook": {
+      "main": [
+        [
+          {
+            "node": "Aviso de posteo Zernio - Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filtrar entrada autorizada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If - Sin video en R2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual": {
+      "main": [
+        [
+          {
+            "node": "Fecha manual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Programado": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha manual": {
+      "main": [
+        []
+      ]
+    },
+    "Aviso de posteo Zernio - Youtube": {
+      "main": [
+        [
+          {
+            "node": "Espera Youtube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener datos Youtube": {
+      "main": [
+        [
+          {
+            "node": "Actualiza datos de Youtube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso de posteo Zernio - Facebook": {
+      "main": [
+        [
+          {
+            "node": "Obtener datos Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espera Youtube": {
+      "main": [
+        [
+          {
+            "node": "Obtener datos Youtube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualiza datos de Youtube": {
+      "main": [
+        [
+          {
+            "node": "Aviso post publicado Youtube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener datos Facebook": {
+      "main": [
+        [
+          {
+            "node": "Actualiza datos de facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualiza datos de facebook": {
+      "main": [
+        [
+          {
+            "node": "Aviso post publicado Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Delete a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a file": {
+      "main": [
+        [
+          {
+            "node": "Actualiza store key eliminado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualiza store key eliminado": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Subir Youtube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Subir Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso post publicado Youtube": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso post publicado Facebook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar entrada autorizada": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Mexico_City",
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

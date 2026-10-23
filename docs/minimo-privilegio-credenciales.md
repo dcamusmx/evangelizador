@@ -1,6 +1,19 @@
 # Mínimo privilegio: public.credenciales aplicado y verificado
 
-Cambio autorizado aplicado el 23 de octubre de 2026 y verificado mediante metadatos en el proyecto exclusivo grjxcsngfnxdkkdkkujh. No se consultaron filas, ciphertexts ni valores de credenciales. El commit 2c44ea9, el cierre de recifrado y los cambios locales pendientes se conservan sin amend/rebase. No hubo cambios de aplicación ni del formato cifrado. Las pruebas funcionales posteriores de panel/lectores siguen pendientes; las secciones de propuesta y captura previa se conservan como evidencia histórica.
+Cambio autorizado aplicado el 23 de octubre de 2026 y verificado mediante metadatos en el proyecto exclusivo grjxcsngfnxdkkdkkujh. No se consultaron filas, ciphertexts ni valores de credenciales. El commit 2c44ea9 y el cierre de recifrado se conservan sin amend/rebase. No hubo cambios de aplicación ni del formato cifrado. El bloque queda cerrado con las confirmaciones manuales y la revisión local del export indicadas a continuación; las secciones de propuesta y captura previa se conservan como evidencia histórica.
+
+## Estado vigente: confirmación funcional del propietario
+
+Actualización de cierre del 23 de octubre de 2026: el propietario confirma manualmente que las siguientes operaciones con una credencial ficticia fueron correctas:
+
+- Creación.
+- Edición del valor y de la descripción.
+- Desactivación y activación.
+- Eliminación.
+
+Es evidencia manual, no pruebas repetidas por el agente. La revisión local del export final también está completada, según [resultados de revisión](resultados-validacion-n8n.md). **Sin comprobaciones pendientes de este bloque.** Las menciones posteriores a pendientes de panel/lectores/export pertenecen al registro histórico y quedan sustituidas por este cierre. No se afirma una prueba HeadBucket adicional no comunicada.
+
+Se conservan separados la validación de fecha del filtro Set y el almacenamiento de cabeceras en la salida original/historial del Webhook: el filtro solo evita propagación. Privilegios predeterminados, usuario exclusivo de n8n y mejoras de publicación/limpieza R2 pertenecen al plan independiente; no se dan por completados ni se modifican por este cierre.
 
 ## Aplicación autorizada y verificación: 23 de octubre de 2026
 
@@ -8,7 +21,7 @@ Se ejecutaron una sola vez los archivos apply.sql y, después del COMMIT confirm
 
 Hora de verificación: **2026-10-23T06:21:39.423Z**. Comparación con la captura previa de 2026-10-23T06:14:12.443Z:
 
-El propietario solicita registrar estos resultados también como **evidencia manual**. Esa confirmación se suma a la salida directa conservada de apply/verify; no se interpreta como una prueba adicional de CRUD del panel o HeadBucket, que no se ha comunicado como realizada después de este cambio.
+El propietario solicita registrar estos resultados también como **evidencia manual**. Esa confirmación se suma a la salida directa conservada de apply/verify. La validación funcional posterior del panel queda registrada por separado al inicio; no se atribuyen estas operaciones al agente ni se infiere una prueba HeadBucket adicional.
 
 | Comprobación | Resultado directo |
 | --- | --- |
@@ -29,7 +42,7 @@ Archivos: apply-executed.sql, verify-executed.sql, baseline-metadata.json, commi
 
 **No volver a ejecutar apply:** sus precondiciones originales deben rechazar el estado ya endurecido. La ACL comprobada coincide con la base posterior que espera recover, pero una recuperación exige decisión explícita y una nueva comprobación de ausencia de deriva; no queda autorizada por esta coincidencia. No restaurar grants por una prueba funcional pendiente ni ampliar permisos sin diagnosticar.
 
-Pendientes: validar manualmente el panel con datos ficticios bajo autorización de escritura y los lectores del servidor mediante una operación segura como HeadBucket; no se dan por probados por verify.sql. Default privileges y usuario exclusivo de n8n continúan pendientes. Sin push, despliegue ni publicación/borrado de videos.
+Comprobaciones del bloque cerradas. verify.sql acredita permisos; las comprobaciones funcionales se registran según la confirmación manual del propietario. Sin nuevas operaciones externas en esta actualización.
 
 ## Captura previa a la aplicación, ejecutada el 23 de octubre de 2026
 

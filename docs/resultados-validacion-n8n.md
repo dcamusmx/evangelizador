@@ -2,9 +2,15 @@
 
 ## Confirmación manual posterior: workflow restaurado
 
-El 22 de octubre de 2026 el propietario confirma: **workflow restaurado y publicación manual funcionando tras la rotación**. Se registra como evidencia manual de funcionamiento real, adicional a las pruebas HTTP siguientes. El agente no efectuó esa publicación ni inspeccionó su ejecución, resultados por plataforma o el grafo final; no se infieren esos detalles ni nuevas autorizaciones de publicación. La revisión estructural del export final sigue pendiente de aportación y no invalida esta confirmación funcional.
+El 22 de octubre de 2026 el propietario confirma: **workflow restaurado y publicación manual funcionando tras la rotación**. Se registra como evidencia manual de funcionamiento real, adicional a las pruebas HTTP siguientes. El agente no efectuó esa publicación ni inspeccionó su ejecución o resultados por plataforma; no se infieren esos detalles ni nuevas autorizaciones de publicación. La revisión estructural posterior del export local se documenta abajo, sin equipararla a inspección administrativa de la instancia.
 
 Resultados registrados el 22 de octubre de 2026. No se guardaron ni imprimieron claves, cuerpos inesperados o headers sensibles. Las claves se introdujeron mediante diálogos locales enmascarados y se usaron únicamente en memoria; sin archivos de entrada, argumentos con secretos ni .env. No se hicieron cambios de credenciales, Vercel o workflows por el agente durante estas pruebas.
+
+## Cierre del bloque: 23 de octubre de 2026
+
+El propietario confirma creación, edición del valor y de la descripción, desactivación, activación y eliminación de la credencial ficticia, todas correctas. La revisión local del export final está completada según la sección siguiente. Se cierran las comprobaciones de este bloque, distinguiendo evidencia manual de revisión estructural local. Sin nuevas peticiones HTTP, publicaciones ni pruebas de escritura del agente. Ver el [estado de credenciales](minimo-privilegio-credenciales.md).
+
+Se mantienen por separado la validación de fecha (el filtro Set no la implementa) y la revisión del almacenamiento de cabeceras originales del Webhook/historial. Filtrar después del Webhook evita propagación, no almacenamiento. El export no declara ajustes de guardado; no se da por resuelto ese riesgo ni se cambian opciones de la instancia.
 
 ## Alcance y evidencia
 
@@ -35,9 +41,32 @@ Los casos no constituyen una transacción ni una captura simultánea de una vers
 
 Los estados 403 por sí solos no prueban que filtro/Respond no se ejecutaran. La desconexión de negocio durante las pruebas procede de la confirmación operativa del propietario; falta contrastar nodos ejecutados e identidad de la versión en el panel/export final. El propietario confirmó después la publicación manual funcionando, según el registro inicial; no es una publicación realizada/verificada directamente por el agente ni una validación de seguridad de la rama de borrado.
 
-## Export final: pendiente de aportar y revisar
+## Export final: revisado y saneado localmente
+
+**Actualización del 23 de octubre de 2026: revisión completada.** El propietario aportó un export nuevo en `C:\Repositorio\Evangelio Diario - WF2 Publicacion diaria Manual.json`, distinto del anterior de Descargas. Se revisó exclusivamente como JSON local, sin ejecutar sus nodos ni importarlo. La revisión del export final queda satisfecha por este archivo, sin afirmar que sea una consulta administrativa del estado activo. La confirmación posterior de edición y cambio de estado, junto con las demás operaciones del panel, cierra las comprobaciones funcionales del bloque.
+
+| Control en el export nuevo | Resultado |
+| --- | --- |
+| Filtro activo | Webhook → Filtrar entrada autorizada → Edit Fields. Nodo Set habilitado, una sola asignación string `body.fecha` desde `$json.body.fecha`; sin incluir otros campos (opción omitida, valor predeterminado false) |
+| Autenticación saliente | HTTP Request usa genericCredentialType/httpHeaderAuth y Header Auth account 2, misma referencia de credencial que el Webhook |
+| Cabecera fija | HTTP Request sin entradas de cabecera manual y sendHeaders no habilitado |
+| Respuesta original | Webhook sin responseMode explícito: modo original Immediately/onReceived; cero nodos Respond to Webhook |
+| Programado | Presente y disabled=true |
+| Referencias posteriores | Sin referencias directas al Webhook ni lecturas explícitas de headers detectadas en parámetros por el analizador local |
+
+El filtro Set evita propagar los demás campos, pero no incorpora la validación de fecha del Code propuesto. Tampoco elimina la entrada original del Webhook ni su historial. No hay ajustes explícitos de guardado de ejecuciones en el export; el guardado efectivo depende de la instancia y no se verifica aquí.
+
+Copia local: `n8n/proposals/internal-api-key/publication.final.sanitized.json`. Se excluyeron pinData, staticData y metadatos de instancia; se sustituyeron referencias de credenciales, identificadores de cuentas/destinos y ruta del Webhook. La copia queda active=false solo como material de revisión; no es un archivo listo para importar ni cambia el original. No se imprimieron valores de credenciales ni datos fijados.
+
+### Comprobaciones locales del cierre
+
+El 23 de octubre se aprobaron las 11 pruebas locales de filtros/saneamiento n8n y las aserciones estructurales sobre el JSON final: 31 nodos, filtro Set habilitado, autenticación administrada, sin cabecera manual, respuesta original y Programado deshabilitado. No se ejecutó código del export. El análisis de los tres archivos del cierre no detectó patrones de secretos ni coincidencias con la antigua cabecera fija, comparada solo en memoria. La copia no contiene pinData, staticData ni metadatos privados de instancia; los IDs de credenciales/destinos se sustituyeron. git diff --check correcto. No se repiten build ni TypeScript porque no cambia código de aplicación, dependencias o configuración ejecutable. Estos controles locales no prueban opciones efectivas de guardado en n8n.
+
+### Registro histórico anterior, sustituido por la revisión precedente
 
 El único archivo aportado disponible en Descargas se volvió a inspeccionar localmente, solo por estructura: sigue teniendo 30 nodos, active=true, un Webhook, cabecera manual fija en HTTP Request, sin autenticación administrada saliente, sin Filtrar entrada autorizada ni Respond, y Programado habilitado. Es evidencia del export anterior, **no del estado final probado**. No se sobrescribió ni se volvió a ejecutar su contenido.
+
+Por tanto, no están comprobados en un export final el filtro activo, la autenticación administrada saliente, la ausencia de cabecera fija, la respuesta original restaurada ni Programado deshabilitado. La ausencia de Respond y el modo original del Webhook en el archivo antiguo no demuestran su restauración posterior. No se genera otra copia de ese export antiguo presentándola como final.
 
 La copia publication.prepared.json es una propuesta saneada previa, no un export posterior de la instancia. No renombrarla como estado final ni dar por restauradas sus conexiones. Para completar la revisión se requiere un nuevo export del mismo workflow con sus nodes/connections/settings/typeVersion y referencias de credenciales saneadas, sin valores, pinData, staticData sensible ni historial de ejecuciones. No adjuntar credenciales descifradas. Puede aportarse una ruta local para sanearlo sin mostrar su contenido.
 
